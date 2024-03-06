@@ -42,24 +42,15 @@ module.exports = (() => {
 			joinedOn: { type: Date, default: Date.now },
 			lastLoginOn: Date,
 			lastUpdatedOn: Date,
-			devices: [
-				// devices are actually browsers, that a user is authenticated on
-				{
-					token: { type: String, index: true }, // authentication token
-					pushCredentials: Object, //  Push subscription data which includes push endpoint, token & auth credentials
-					userAgent: { type: String },
-				},
-			],
+			token: [{ type: String, index: true }],
 		});
 
 		const listSchema = new Schema({
 			name: String,
 			isPublic: Boolean,
+			createdBy: { type: Schema.Types.ObjectId, ref: "Users", index: true },
 			createdOn: { type: Date, default: Date.now },
 			updatedOn: Date,
-			members: [{ type: Schema.Types.ObjectId, ref: "Users", index: true }],
-			emails: [{ type: String, index: true }],
-			pushSubscribers: [{ type: Schema.Types.ObjectId, ref: "Users", index: true }],
 		});
 
 		const bookmarkSchema = new Schema({
@@ -67,16 +58,14 @@ module.exports = (() => {
 			title: String,
 			createdOn: { type: Date, default: Date.now, index: true },
 			updatedOn: { type: Date, default: Date.now, index: true },
-			updatedBy: { type: Schema.Types.ObjectId, ref: "Users", index: true },
 			createdBy: { type: Schema.Types.ObjectId, ref: "Users", index: true },
 			domain: { type: String, index: true },
-			notes: String,
 			tags: [{ type: String, index: true }],
 			list: { type: Schema.Types.ObjectId, ref: "Lists", index: true },
 			textContent: String,
 			readableContent: String,
 		});
-		bookmarkSchema.index({ title: "text", notes: "text", textContent: "text" });
+		bookmarkSchema.index({ title: "text", textContent: "text" });
 
 		const Users = mongoose.model("Users", channelSchema);
 		const Lists = mongoose.model("Lists", listSchema);
