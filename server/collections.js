@@ -31,47 +31,45 @@ module.exports = (() => {
 
 		connectToDb();
 
-		console.log("Onlie DB initialized");
+		console.log("WebTag DB initialized");
 
 		const userSchema = new Schema({
+			username: { type: String, index: true, required: true, unique: true, match: /^([a-zA-Z0-9]){1,18}$/ },
 			email: { type: String, index: true, unique: true, required: true },
 			password: { type: String, required: true },
-			name: String,
-			website: String,
 			emailVerificationCode: { type: String, index: true },
 			joinedOn: { type: Date, default: Date.now },
 			lastLoginOn: Date,
 			lastUpdatedOn: Date,
-			token: [{ type: String, index: true }],
-		});
-
-		const listSchema = new Schema({
-			name: String,
-			isPublic: Boolean,
-			createdBy: { type: Schema.Types.ObjectId, ref: "Users", index: true },
-			createdOn: { type: Date, default: Date.now },
-			updatedOn: Date,
+			devices: [
+				// devices are actually browsers, that a user is authenticated on
+				{
+					token: { type: String, index: true }, // authentication token
+					pushCredentials: Object, //  Push subscription data which includes push endpoint, token & auth credentials
+					userAgent: { type: String },
+				},
+			],
+			tags: [{ type: String }],
+			defaultTags: [{ type: String }],
+			publicTags: [{ type: String }],
 		});
 
 		const bookmarkSchema = new Schema({
-			url: { type: String, index: true },
+			url: { type: String, index: true, required: true },
 			title: String,
 			createdOn: { type: Date, default: Date.now, index: true },
 			updatedOn: { type: Date, default: Date.now, index: true },
 			createdBy: { type: Schema.Types.ObjectId, ref: "Users", index: true },
-			domain: { type: String, index: true },
 			tags: [{ type: String, index: true }],
-			list: { type: Schema.Types.ObjectId, ref: "Lists", index: true },
 			textContent: String,
 			readableContent: String,
 		});
 		bookmarkSchema.index({ title: "text", textContent: "text" });
 
 		const Users = mongoose.model("Users", channelSchema);
-		const Lists = mongoose.model("Lists", listSchema);
 		const Bookmarks = mongoose.model("Bookmarks", bookmarkSchema);
 
-		return { Users, Lists, Bookmarks };
+		return { Users, Bookmarks };
 	};
 	return {
 		getInstance: () => {
