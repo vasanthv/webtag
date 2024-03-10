@@ -1,0 +1,267 @@
+:root {
+	--background: #ffffff;
+	--text: #111111;
+	--text-light: #555555;
+	--red: #c0392b;
+	--green: #27ae60;
+	--blue: #3274dc;
+}
+* {
+	outline: 0;
+}
+html {
+	-webkit-overflow-scrolling: touch;
+}
+body {
+	background: var(--background);
+	color: var(--text);
+	margin: 0;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+		"Helvetica Neue", sans-serif;
+	line-height: 1.5;
+	transition: background 0.5s;
+}
+a,
+a:focus,
+a:active {
+	color: #2a66c6;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+footer {
+	text-align: center;
+	padding: 1rem 1rem 2rem;
+	font-size: 0.9rem;
+	color: #363636;
+}
+label {
+	font-weight: bold;
+}
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea {
+	display: block;
+	border: 0.1rem solid var(--text-light);
+	background: var(--background);
+	color: var(--text);
+	font-family: inherit;
+	font-size: 1rem;
+	width: 100%;
+	max-width: 420px;
+	padding: 0.5rem 1rem;
+	border-radius: 0.2rem;
+	box-sizing: border-box;
+	margin-bottom: 1rem;
+}
+input[type="search"] {
+	display: inline-block;
+	margin-right: 0.25rem;
+}
+::placeholder {
+	opacity: 0.7;
+}
+button,
+a.button {
+	display: inline-block;
+	background: var(--text);
+	color: var(--background);
+	border: none;
+	border-radius: 0.2rem;
+	font-family: inherit;
+	font-size: 1rem;
+	padding: 0.5rem 1rem;
+	cursor: pointer;
+	text-decoration: none;
+	margin-bottom: 1rem;
+}
+button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+code {
+	display: block;
+	border: 1px solid var(--text-light);
+	padding: 0.25rem;
+	border-radius: 0.25rem;
+	cursor: text;
+	margin-bottom: 0.25rem;
+	word-wrap: break-word;
+}
+
+.wrap {
+	width: 100%;
+	max-width: 720px;
+	margin-inline: auto;
+	padding: 0px 1rem;
+	box-sizing: border-box;
+}
+.light {
+	color: var(--text-light);
+}
+.small {
+	font-size: 0.9rem;
+}
+.semibold {
+	font-weight: 600;
+}
+.bold {
+	font-weight: 700;
+}
+.flex {
+	display: flex;
+	align-items: center;
+}
+.space-between {
+	justify-content: space-between;
+}
+.flex-1 {
+	flex: 1;
+}
+.row {
+	margin: 1rem 0px;
+}
+.spacer {
+	height: 1rem;
+}
+.errorMsg {
+	border-radius: 0.1rem;
+	box-sizing: border-box;
+	line-height: 2;
+	margin: 1rem auto;
+	padding: 0px 0.5rem;
+	transition: max-height 0.25s ease-in;
+}
+.errorMsg.error {
+	background: var(--red);
+	color: var(--background);
+}
+.errorMsg.success {
+	background: var(--green);
+	color: var(--background);
+}
+.links span:after {
+	content: " · ";
+	margin: auto 0.2rem;
+}
+.links.spaced span:after {
+	content: " ";
+}
+.links span:last-child:after {
+	content: "";
+	margin: 0rem;
+}
+.bookmarks ol {
+	padding-inline-start: 1rem;
+}
+.bookmarks article {
+	margin: 2rem auto;
+}
+.bookmarks article a.title,
+.bookmarks article .title {
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	position: relative;
+	font-size: 1.2rem;
+	color: var(--text);
+}
+.bookmarks article a.title:visited {
+	color: var(--text-light);
+}
+.bookmarks article .notes {
+	margin-left: 0.5rem;
+	border-left: 2px solid var(--text-light);
+	padding-left: 0.5rem;
+	font-style: italic;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+.bookmarks article .meta {
+	margin-top: 0.25rem;
+}
+
+#page-title {
+	font-size: 2rem;
+	margin: auto;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+header button,
+header button:focus {
+	display: block;
+	width: 3rem;
+	height: 3rem;
+	min-width: 2rem;
+	box-sizing: border-box;
+	background: none;
+	border: none;
+	border-radius: 50%;
+	cursor: pointer;
+	margin: 0px;
+	padding: 0px;
+	color: var(--text);
+	font-size: 1.5rem;
+	text-decoration: none;
+	text-align: center;
+	line-height: 3rem !important;
+	position: relative;
+	top: 0.25rem;
+}
+header button:hover {
+	background: rgba(100, 100, 100, 0.1);
+	text-decoration: none;
+}
+#logo {
+	width: 2.5rem;
+	height: 2.5rem;
+	padding: 0px;
+	margin-right: 0.25rem;
+}
+#logo:hover {
+	background: none;
+}
+#logo img {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	top: 0.1rem;
+	right: 0.5rem;
+}
+#toast {
+	position: fixed;
+	top: 1rem;
+	left: 0px;
+	right: 0px;
+	width: 100%;
+	z-index: 10;
+	max-width: 480px;
+	margin-inline: auto;
+	padding: 0.5rem 1rem;
+	border-radius: 0.25rem;
+}
+#desc {
+	font-size: 1.3rem;
+}
+#pagination a {
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+#newBookmark input[type="text"],
+#newBookmark textarea {
+	max-width: 640px;
+}
+#newBookmark button {
+	width: 10rem;
+}
+#search {
+	display: none;
+}
+#dragBookmarklet {
+	cursor: move;
+}

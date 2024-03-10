@@ -1,0 +1,24 @@
+<% if (user) { %>
+<nav class="row links">
+	<span><a href="/my" aria-label="my links">Home</a></span>
+	<span><a href="/followings"  aria-label="following">Following</a></span>
+	<span><a href="/tags"  aria-label="tags">Tags</a></span>
+	<span><a href="/recent" aria-label="recent feed">Recent</a></span>
+	<span><a href="/popular" aria-label="popular feed">Popular</a></span>
+	<span><a href="/@<%= user.username %>" aria-label="my profile">Profile</a></span>
+</nav>
+<% } else { %>
+<nav class="row links">
+	<span><a href="/recent" aria-label="recent feed">Recent</a></span>
+	<span><a href="/popular" aria-label="popular feed">Popular</a></span>
+	<span><a href="/register" aria-label="registration">Register</a></span>
+	<span><a href="/login" aria-label="log in">Log in</a></span>
+</nav>
+<% } %>
+<section
+	id="toast"
+	v-if="toast.message"
+	v-bind:class="'wrap errorMsg ' + toast.type"
+	v-on:click="toast.message = ''"
+	v-html="toast.message"
+></section>

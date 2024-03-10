@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<%- include('html-head'); -%>
+	<body>
+		<div id="app" class="wrap">
+			<main>
+				<header class="row">
+					<div class="flex">
+						<a href="/" id="logo" aria-label="home page"><img src="/favicon.svg" alt="currl logo" /></a>
+						<h1 id="page-title" class="flex-1 bold"><%= pageTitle %></h1>
+						<% if(typeof hideSearch === "undefined") { %>
+							<a href="javascript:void(0)" class="icon-search" v-on:click="showSearch=!showSearch" aria-label="search"></a>
+						<% } %>
+						<% if(user) { %> <a href="/bookmark" class="icon-plus" aria-label="add bookmark"></a><% } %>
+					</div>
+				</header>
+				<% if(typeof showIntro !== "undefined") { %>
+				<section id="desc">
+					A free text-based social bookmarking website. Collect links you love from around the web.
+				</section>
+				<% } %>
+				<%- include('nav'); -%>
+				<% if (bookmarks.error) { %>
+					<section class="errorMsg error"><%= bookmarks.message %></section>
+				<% } %>
+				<section id="search" v-if="showSearch" v-bind:style="'display:block;'">
+					<input type="search" placeholder="Search..." v-model="searchQuery" v-on:keydown.enter="searchHandler" />
+					<button v-on:click="searchHandler">Search</button>
+				</section>
+
+				<%- include('profile'); -%>
+
+				<% if(domain){ %>
+					<h3>Domain: <%=domain%></h3>
+				<% } %>
+				<% if(tags){ %>
+					<h3>Tagged: <%=tags%></h3>
+				<% } %>
+
+				<section class="bookmarks">
+					<% bookmarks.bookmarks.forEach(function(bookmark){ %>
+    				<article>
+							<div class="row">
+								<a
+									href="<%= bookmark.url.url %>"
+									target="_blank"
+									class="title"
+									rel="noopener noreferrer"
+									><%= bookmark.title.substring(0, 160) %></a
+								>
+
+								<% if(bookmark.notes){ %>
+									<div class="notes light"><%= bookmark.notes %></div>
+								<% } %>
+
+								<div class="tags links spaced">
+									<span><a href="?domain=<%= bookmark.domain%>" class="light"><%= bookmark.domain.replace(/^www\./,'')%></a></span>
+									<% if(bookmark.tags && bookmark.tags.length > 0){ %>
+											<% bookmark.tags.forEach(function(tag){ %><span><a href="?t=<%=tag%>" class="light">#<%=tag%></a></span><% }) %>
+									<% } %>
+								</div>
+
+								<div class="meta small light links">
+									<span>
+										<% if(bookmark.isPrivate){ %>🔒 <% } %>
+										<time title="<%= bookmark.createdOn %>" v-html="formatDate('<%= bookmark.createdOn %>')"></time>
+									</span>
+									<span><a href="/@<%= bookmark.createdBy.username %>"><%= bookmark.createdBy.username %></a></span>
+									<span><%= bookmark.url.bookmarkedBy.length %> save<%= (bookmark.url.bookmarkedBy.length > 1 ? 's' : '') %></span>
+									<span>
+										<a href="javascript:void(0)" v-on:click="saveLinkHandler" data-url="<%= bookmark.url.url %>"><%=(user && bookmark.url.bookmarkedBy.some(b => b.equals(user._id)) ? "un" : "") %>save</a>
+									</span>
+									<% if(user && user.username === bookmark.createdBy.username){ %>
+										<span><a href="/bookmark/edit?id=<%=bookmark._id%>">edit</a></span>
+									<% } %>
+
+								</div>
+							</div>
+						</article>
+  				<% }); %>
+					
+					<% if(bookmarks.bookmarks.length === 0) { %>
+						<div class="spacer"></div>
+						<div class="spacer"></div>
+						<div class="light">No bookmarks to show</div>
+						<div class="spacer"></div>
+						<div class="spacer"></div>
+					<% } %>
+
+					<div id="pagination" class="links">
+						<% if(page > 1) { %><span><a v-bind:href="prevPageLink">&larr; PREVIOUS PAGE</a></span><% } %>
+						<% if(bookmarks.bookmarks.length === 50) { %><span><a v-bind:href="nextPageLink">NEXT PAGE &rarr;</a></span><% } %>
+					</div>
+				</section>
+
+				<%- include('footer'); -%>
+			</main>
+		</div>
+	</body>
+</html>

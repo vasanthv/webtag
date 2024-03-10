@@ -31,7 +31,7 @@ module.exports = (() => {
 
 		connectToDb();
 
-		console.log("WebTag DB initialized");
+		console.log("Webtag DB initialized");
 
 		const userSchema = new Schema({
 			username: { type: String, index: true, required: true, unique: true, match: /^([a-zA-Z0-9]){1,18}$/ },
