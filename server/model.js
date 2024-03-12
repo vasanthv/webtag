@@ -1,8 +1,6 @@
 const { generateApiKey } = require("generate-api-key");
 const randomString = require("randomstring");
 const uuid = require("uuid").v4;
-const path = require("path");
-const fs = require("fs");
 
 const config = require("./config");
 const helper = require("./helper");
@@ -348,15 +346,6 @@ const logOut = async (req, res, next) => {
 	}
 };
 
-const errorLog = async (req, res, next) => {
-	try {
-		console.error({ browserError: req.body });
-		res.send();
-	} catch (error) {
-		next(error);
-	}
-};
-
 module.exports = {
 	signUp,
 	logIn,
@@ -374,6 +363,4 @@ module.exports = {
 	getBookmarks,
 	getTags,
 	logOut,
-	sendEmailToUsers,
-	errorLog,
 };

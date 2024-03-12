@@ -9,7 +9,6 @@ const axios = require("axios");
 const { URL } = require("url");
 
 const config = require("./config");
-const sendEmail = require("./email");
 const { Users, Bookmarks } = require("./collections").getInstance();
 
 /**
@@ -42,6 +41,9 @@ const isValidUrl = (url) => {
 	} catch (e) {
 		return false;
 	}
+};
+const hashString = (str) => {
+	return crypto.createHash("sha256", config.SECRET).update(str).digest("hex");
 };
 const getValidPassword = (password) => {
 	if (!password) return httpError(400, "Invalid password");
@@ -156,33 +158,6 @@ const isNewEmail = async (email, currentUserId) => {
 	const existingEmail = await Users.findOne(query).select("email").exec();
 	return existingEmail ? httpError(400, "Email already taken") : email;
 };
-const getUserByUsername = async (username, fields = "username name website createdOn contacts devices blocked") => {
-	let query = { username: { $regex: new RegExp(`^${username}$`, "i") } };
-
-	return await Users.findOne(query).select(fields).exec();
-};
-const getUserByEmail = async (email, fields = "username name website createdOn contacts devices blocked") => {
-	let query = { email: { $regex: new RegExp(`^${email}$`, "i") } };
-
-	return await Users.findOne(query).select(fields).exec();
-};
-const getRecipients = async (user, toUser) => {
-	switch (toUser.username) {
-		case "all": {
-			const me = await Users.findOne({ _id: user._id })
-				.populate([{ path: "contacts.user", select: "username contacts devices blocked" }])
-				.exec();
-			return me.contacts.map((c) => c.user);
-		}
-		default:
-			return [toUser];
-	}
-};
-const inviteEmail = async (user, email) => {
-	const updateField = { $push: { invitees: email } };
-	await Users.updateOne({ _id: user._id }, updateField);
-	return await sendEmail.sendInviteEmail(user, email);
-};
 
 /* Send link as push notifications */
 const sendPushNotification = async (recipient, title, body) => {
@@ -201,10 +176,6 @@ const sendPushNotification = async (recipient, title, body) => {
 	} catch (err) {
 		console.error(err);
 	}
-};
-
-const hashString = (str) => {
-	return crypto.createHash("sha256", config.SECRET).update(str).digest("hex");
 };
 
 const saveBookmark = async (url, tags, user, titleText = "") => {
@@ -274,8 +245,6 @@ module.exports = {
 	getReadableContent,
 	isNewUsername,
 	isNewEmail,
-	getUserByUsername,
-	getUserByEmail,
 	hashString,
 	httpError,
 	attachUsertoRequest,
@@ -284,8 +253,6 @@ module.exports = {
 	csrfValidator,
 	rateLimit,
 	speedLimiter,
-	getRecipients,
-	inviteEmail,
 	sendPushNotification,
 	saveBookmark,
 	updateReadableContent,

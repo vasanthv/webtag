@@ -27,7 +27,10 @@ router.use(
 router.get("/verify/:code", model.verifyEmail);
 router.get("/meta", (req, res) => res.json({ vapidKey: config.PUSH_OPTIONS.vapidDetails.publicKey }));
 router.get("/users", model.getStats);
-router.post("/error", model.errorLog);
+router.post("/error", (req, res) => {
+	console.error({ browserError: req.body });
+	res.send();
+});
 
 // Basic CSRF implementation
 // TODO: Replace with other better npm packages if available
