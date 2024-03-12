@@ -10,9 +10,11 @@ module.exports = {
 	AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY_ID,
 	AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
 	INVALID_HANDLES: ["administrator", "admin", "bot", "webtag"],
+	NO_REPLY_EMAIL: process.env.NO_REPLY_EMAIL ?? "Webtag <noreply@email.webtag.io>",
+	CONTACT_EMAIL: process.env.CONTACT_EMAIL,
 	PUSH_OPTIONS: {
 		vapidDetails: {
-			subject: "mailto:vasanth@webtag.io",
+			subject: process.env.CONTACT_EMAIL,
 			publicKey: process.env.VAPID_PUBLIC_KEY,
 			privateKey: process.env.VAPID_PRIVATE_KEY,
 		},

@@ -4,7 +4,7 @@ const path = require("path");
 const app = express();
 
 const config = require("./server/config");
-const appRoutes = require("./server/routes");
+const apiRoutes = require("./server/routes");
 // const urlShortenerRoutes = require("./api/url-shortener");
 
 // Set the view engine
@@ -17,13 +17,13 @@ app.use(express.static(path.join(__dirname, "node_modules/page/")));
 
 // Serve frontend assets & images to the browser
 app.use(express.static(path.join(__dirname, "assets")));
-app.use(express.static(path.join(__dirname, "static-pages")));
+app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(__dirname, "www"), { maxAge: 0 }));
 
 // Handle API requests
 app.use(morgan("dev")); // for dev logging
 
-app.use(appRoutes);
+app.use("/api", apiRoutes);
 
 // app.use(["/", "/read", "/signup", "/login", "/account", "/@:user/:list"], (req, res) =>
 // 	res.sendFile(path.join(__dirname, "www/index.html"))

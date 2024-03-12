@@ -3,7 +3,7 @@
  */
 
 const mongoose = require("mongoose");
-const config = require("../config");
+const config = require("./config");
 
 module.exports = (() => {
 	let instance;
@@ -13,9 +13,7 @@ module.exports = (() => {
 	mongoose.set("strictQuery", true);
 
 	const connectToDb = () => {
-		mongoose.connect(config.MONGODB_URI, {
-			useNewUrlParser: true,
-		});
+		mongoose.connect(config.MONGODB_URI);
 	};
 
 	const createInstance = () => {
@@ -23,7 +21,7 @@ module.exports = (() => {
 			console.error("Error in MongoDb connection: " + error);
 			mongoose.disconnect(); // Trigger disconnect on any error
 		});
-		db.on("connected", () => console.log("Atomate DB connected"));
+		db.on("connected", () => console.log("Webtag DB connected"));
 		db.on("disconnected", () => {
 			console.log("MongoDB disconnected!");
 			connectToDb();
@@ -49,9 +47,9 @@ module.exports = (() => {
 					userAgent: { type: String },
 				},
 			],
-			tags: [{ type: String }],
 			defaultTags: [{ type: String }],
 			publicTags: [{ type: String }],
+			apiKeys: [{ type: String, index: true }],
 		});
 
 		const bookmarkSchema = new Schema({
@@ -66,7 +64,7 @@ module.exports = (() => {
 		});
 		bookmarkSchema.index({ title: "text", textContent: "text" });
 
-		const Users = mongoose.model("Users", channelSchema);
+		const Users = mongoose.model("Users", userSchema);
 		const Bookmarks = mongoose.model("Bookmarks", bookmarkSchema);
 
 		return { Users, Bookmarks };
