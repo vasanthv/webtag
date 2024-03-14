@@ -1,6 +1,8 @@
 const { generateApiKey } = require("generate-api-key");
 const randomString = require("randomstring");
+const cheerio = require("cheerio");
 const uuid = require("uuid").v4;
+const axios = require("axios");
 
 const config = require("./config");
 const helper = require("./helper");
@@ -10,18 +12,18 @@ const { Users, Bookmarks } = require("./collections").getInstance();
 
 const signUp = async (req, res, next) => {
 	try {
-		const username = await helper.getValidUsername(req.body.username);
+		const username = helper.getValidUsername(req.body.username);
 		await helper.isNewUsername(username);
-		const email = await helper.getValidEmail(req.body.email);
+		const email = helper.getValidEmail(req.body.email);
 		await helper.isNewEmail(email);
-		const password = await helper.getValidPassword(req.body.password);
+		const password = helper.getValidPassword(req.body.password);
 		const userAgent = req.get("user-agent");
 		const date = new Date();
 
 		const emailVerificationCode = uuid();
 		const token = uuid();
 
-		const newUser = await new Users({
+		await new Users({
 			username,
 			email,
 			password,
@@ -29,30 +31,11 @@ const signUp = async (req, res, next) => {
 			devices: [{ token, userAgent }],
 			createdAt: date,
 		}).save();
-		await sendEmail.verificationEmail(username, email, emailVerificationCode);
 		req.session.token = token;
 
-		res.json({ message: "Account created", username });
+		res.json({ message: "Account created. Please verify your email.", username });
 
-		try {
-			const invitedUsers = await Users.find({ invitees: email }).exec();
-			if (invitedUsers && invitedUsers.length > 0) {
-				const addContactPromises = [];
-				invitedUsers.forEach((user) => {
-					addContactPromises.push(
-						Users.updateOne(
-							{ _id: user._id },
-							{ $push: { contacts: { user: newUser._id, sortDate: new Date() } }, $pull: { invitees: email } }
-						),
-						Users.updateOne({ _id: newUser._id }, { $push: { contacts: { user: user._id, sortDate: new Date() } } })
-					);
-				});
-
-				await Promise.all(addContactPromises);
-			}
-		} catch (err) {
-			console.error(err);
-		}
+		sendEmail.verificationEmail(username, email, emailVerificationCode);
 	} catch (error) {
 		next(error);
 	}
@@ -60,8 +43,8 @@ const signUp = async (req, res, next) => {
 
 const logIn = async (req, res, next) => {
 	try {
-		const username = await helper.getValidUsername(req.body.username);
-		const password = await helper.getValidPassword(req.body.password);
+		const username = helper.getValidUsername(req.body.username);
+		const password = helper.getValidPassword(req.body.password);
 
 		const user = await Users.findOne({ username: { $regex: new RegExp(`^${username}$`, "i") }, password }).exec();
 
@@ -214,6 +197,7 @@ const addBookmark = async (req, res, next) => {
 		}
 
 		const url = helper.getValidURL(req.body.url);
+		let title = helper.sanitizeText(req.body.title);
 		const tags = req.body.tags ? helper.getValidTags(req.body.tags) : [];
 
 		// Check if this URL is bookmarked before
@@ -222,11 +206,30 @@ const addBookmark = async (req, res, next) => {
 			return res.status(409).json({ message: "Bookmark already exist" });
 		}
 
-		const _newBookmark = await helper.saveBookmark(url, tags, req.user);
+		if (!title) {
+			title = title ?? url.slice(0, 30) + (url.length > 30 ? "..." : "");
+			// Get title of the URL
+			try {
+				const rawHtmlContents = (await axios.get(url)).data;
+				if (rawHtmlContents) {
+					const htmlDocument = cheerio.load(rawHtmlContents);
+					title = (htmlDocument("head title").text().trim() || title).substring(0, 160);
+				}
+			} catch (err) {
+				// ignore this error and use the fallback title
+			}
+		}
 
-		res.json({ message: "Bookmark saved", _id: _newBookmark._id });
+		const newBookmark = await new Bookmarks({
+			url,
+			title,
+			createdOn: new Date(),
+			updatedOn: new Date(),
+			createdBy: req.user._id,
+			tags,
+		}).save();
 
-		await helper.updateReadableContent(_newBookmark);
+		res.json({ message: "Bookmark saved", _id: newBookmark._id });
 	} catch (error) {
 		next(error);
 	}

@@ -4,7 +4,7 @@
 	--text-light: #555555;
 	--red: #c0392b;
 	--green: #27ae60;
-	--blue: #3274dc;
+	--blue: #0077ff;
 }
 * {
 	outline: 0;
@@ -24,7 +24,7 @@ body {
 a,
 a:focus,
 a:active {
-	color: #2a66c6;
+	color: var(--blue);
 	text-decoration: none;
 }
 a:hover {

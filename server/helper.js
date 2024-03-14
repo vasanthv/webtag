@@ -1,11 +1,7 @@
-const { Readability, isProbablyReaderable } = require("@mozilla/readability");
 const rateLimiter = require("express-rate-limit");
 const slowDown = require("express-slow-down");
-const createDOMPurify = require("dompurify");
 const webPush = require("web-push");
-const { JSDOM } = require("jsdom");
 const crypto = require("crypto");
-const axios = require("axios");
 const { URL } = require("url");
 
 const config = require("./config");
@@ -59,40 +55,12 @@ const getValidTags = (tagString) => {
 		.map((s) => s.toLowerCase());
 };
 const randomString = () => "_" + Math.random().toString(36).substr(2, 9);
-
-const getURLContents = async (url) => {
-	try {
-		const { data } = await axios(url);
-		return data;
-	} catch (err) {
-		return err.response?.data ?? "";
-	}
-};
-
-const getPageTitle = (contents) => {
-	try {
-		const dom = new JSDOM(contents);
-		return dom.window.document.title ?? "";
-	} catch (err) {
-		console.error(err);
-		return "";
-	}
-};
-
-const getReadableContent = async (contents) => {
-	let response = {};
-	try {
-		const dom = new JSDOM(contents);
-		if (!isProbablyReaderable(dom.window.document)) return response;
-		let { textContent, content } = new Readability(dom.window.document).parse();
-		const DOMPurify = createDOMPurify(dom.window);
-
-		response = { text: textContent.trim(), content: DOMPurify.sanitize(content) };
-		return response;
-	} catch (err) {
-		console.error(err);
-		return response;
-	}
+const sanitizeText = (text) => {
+	if (!text) "";
+	const tagsToReplace = { "&": "&amp;", "<": "&lt;", ">": "&gt;" };
+	const replaceTag = (tag) => tagsToReplace[tag] || tag;
+	const safe_tags_replace = (str) => str.replace(/[&<>]/g, replaceTag);
+	return safe_tags_replace(text.replace("\b", ""));
 };
 
 /* Middlewares */
@@ -201,27 +169,6 @@ const saveBookmark = async (url, tags, user, titleText = "") => {
 	return newBookmark;
 };
 
-const updateReadableContent = async (bookmark) => {
-	try {
-		console.log(bookmark.url);
-		// Get contents of the URL
-		const urlContents = await getURLContents(bookmark.url);
-
-		// update the readable content of the bookmarks
-		if (urlContents) {
-			const { text, content } = await getReadableContent(urlContents);
-
-			console.log({ text, content });
-			if (content) {
-				await Bookmarks.updateOne({ _id: bookmark._id }, { textContent: text, readableContent: content });
-			}
-		}
-	} catch (err) {
-		// ignore
-		console.log(err);
-	}
-};
-
 //Throws a error which can be usernamed and changed to HTTP Error in the Express js Error handling middleware.
 const httpError = (code, message) => {
 	code = code ? code : 500;
@@ -240,9 +187,7 @@ module.exports = {
 	getValidPassword,
 	getValidTags,
 	randomString,
-	getURLContents,
-	getPageTitle,
-	getReadableContent,
+	sanitizeText,
 	isNewUsername,
 	isNewEmail,
 	hashString,
@@ -255,5 +200,4 @@ module.exports = {
 	speedLimiter,
 	sendPushNotification,
 	saveBookmark,
-	updateReadableContent,
 };

@@ -59,10 +59,8 @@ module.exports = (() => {
 			updatedOn: { type: Date, default: Date.now, index: true },
 			createdBy: { type: Schema.Types.ObjectId, ref: "Users", index: true },
 			tags: [{ type: String, index: true }],
-			textContent: String,
-			readableContent: String,
 		});
-		bookmarkSchema.index({ title: "text", textContent: "text" });
+		bookmarkSchema.index({ title: "text", url: "text" });
 
 		const Users = mongoose.model("Users", userSchema);
 		const Bookmarks = mongoose.model("Bookmarks", bookmarkSchema);
