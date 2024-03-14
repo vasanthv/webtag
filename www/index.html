@@ -51,8 +51,8 @@
 						<li>Plain-text based bookmarking. No fancy images or graphics.</li>
 						<li>Tags. Organize your bookmarks with multiple tags.</li>
 						<li>Private. All bookmarks are private by default.</li>
-						<li>Export bookmarks. Not happy with us? Export all your bookmarks anytime.</li>
 						<li>Import bookmarks. Bring in all your bookmarks from other services or browsers.</li>
+						<li>Export bookmarks. Not happy with us? Export all your bookmarks anytime.</li>
 						<li>Works on any device with an internet connection and browser.</li>
 						<li>Free unlimited bookmarks. No limits on storage.</li>
 					</ul>
@@ -153,19 +153,13 @@
 					</section>
 
 					<section v-if="page === 'home'"></section>
-					<!-- <section  v-if="page === 'read'">
-						<h1 class="page-title">Article title</h1>
-							<div v-html="linkify(read.body)"></div>
-							<br/><br/>
-							<a v-bind:href="">Open original URL</a>
-						</div>
-					</section> -->
+					<section v-if="page === 'tags'"></section>
 
-					<!-- <section  v-if="page === '404'">
+					<section v-if="page === '404'">
 						<h1 class="page-title">Page not found</h1>
 						<div>The page you are looking for does not exist.</div>
 						<a href="/">Back to home</a>
-					</section> -->
+					</section>
 				</main>
 			</div>
 		</div>

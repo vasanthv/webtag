@@ -361,11 +361,6 @@ page("/login", () => {
 	else App.page = "login";
 });
 
-page("/read/:id", () => {
-	if (App.isloggedIn) return page.redirect("/");
-	App.page = "read";
-});
-
 page("/tags", (ctx) => {
 	console.log(ctx.querystring);
 	if (!App.isloggedIn) return page.redirect("/login");
