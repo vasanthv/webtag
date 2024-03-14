@@ -1,7 +1,7 @@
 {
-	"name": "Currl",
-	"short_name": "Currl",
-	"description": "Save, tag & discover links you love from around the web",
+	"name": "Webtag",
+	"short_name": "Webtag",
+	"description": "A free bookmarking website.",
 	"icons": [
 		{
 			"src": "icon.png",
@@ -20,16 +20,9 @@
 			"sizes": "any"
 		}
 	],
-	"theme_color": "#fff",
+	"theme_color": "#0077ff",
 	"background_color": "#fff",
 	"display": "standalone",
 	"start_url": "/",
-	"permissions": ["notifications"],
-	"share_target": {
-		"action": "/bookmark",
-		"method": "GET",
-		"params": {
-			"url": "link"
-		}
-	}
+	"permissions": ["notifications"]
 }

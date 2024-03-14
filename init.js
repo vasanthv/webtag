@@ -16,8 +16,8 @@ app.use(express.static(path.join(__dirname, "node_modules/vue/dist/")));
 app.use(express.static(path.join(__dirname, "node_modules/page/")));
 
 // Serve frontend assets & images to the browser
-app.use(express.static(path.join(__dirname, "assets")));
 app.use(express.static(path.join(__dirname, "static")));
+app.use(express.static(path.join(__dirname, "static/icons")));
 app.use(express.static(path.join(__dirname, "www"), { maxAge: 0 }));
 
 // Handle API requests
@@ -29,7 +29,7 @@ app.use("/api", apiRoutes);
 // 	res.sendFile(path.join(__dirname, "www/index.html"))
 // );
 
-// app.use("/*", (req, res) => res.sendFile(path.join(__dirname, "pages/404.html")));
+app.use("/*", (req, res) => res.sendFile(path.join(__dirname, "www/index.html")));
 
 // Start the server
 app.listen(config.PORT, null, function () {

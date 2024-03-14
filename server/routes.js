@@ -26,7 +26,6 @@ router.use(
 
 router.get("/verify/:code", model.verifyEmail);
 router.get("/meta", (req, res) => res.json({ vapidKey: config.PUSH_OPTIONS.vapidDetails.publicKey }));
-router.get("/users", model.getStats);
 router.post("/error", (req, res) => {
 	console.error({ browserError: req.body });
 	res.send();
@@ -69,6 +68,7 @@ router.put("/bookmarks/:id", model.updateBookmark);
 router.delete("/bookmarks/:id", model.deleteBookmark);
 router.put("/bookmarks/:id/removeme", model.removeMeFromTag);
 router.get("/bookmarks", model.getBookmarks);
+router.get("/bookmarks/:id", model.getBookmark);
 
 router.get("/tags", model.getTags);
 

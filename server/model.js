@@ -294,7 +294,7 @@ const getBookmarks = async (req, res, next) => {
 		if (tags.length > 0) query = { ...query, tags: { $in: tags } };
 
 		const bookmarks = await Bookmarks.find(query)
-			.select("url title createdBy tags readableContent")
+			.select("url title createdBy tags")
 			.skip(skip)
 			.populate([{ path: "createdBy", select: "username" }])
 			.limit(config.PAGE_LIMIT)
@@ -302,6 +302,23 @@ const getBookmarks = async (req, res, next) => {
 			.exec();
 
 		res.json({ bookmarks });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const getBookmark = async (req, res, next) => {
+	try {
+		const id = req.params.id;
+
+		let query = { $and: [{ _id: id }, { $or: [{ createdBy: req.user._id }, { tags: `@${req.user.username}` }] }] };
+
+		const bookmark = await Bookmarks.findOne(query)
+			.select("url title createdBy tags readableContent")
+			.populate([{ path: "createdBy", select: "username" }])
+			.exec();
+
+		res.json({ bookmark });
 	} catch (error) {
 		next(error);
 	}
@@ -361,6 +378,7 @@ module.exports = {
 	deleteBookmark,
 	removeMeFromTag,
 	getBookmarks,
+	getBookmark,
 	getTags,
 	logOut,
 };

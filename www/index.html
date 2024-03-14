@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Cache-control" content="public" />
+		<meta
+			name="viewport"
+			content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
+		/>
+		<meta name="description" content="A free text-based bookmarking website." />
+		<meta name="keywords" content="bookmarking, free bookmarking, push notifications, web push" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<!-- Icons & Theme-->
+		<meta name="theme-color" content="#0077ff" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="mask-icon" href="/mask-icon.svg" color="#0077ff" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.json" />
+
+		<!-- Meta data for link fetching -->
+		<meta property="og:url" content="https://webtag.io" />
+		<meta property="og:image" content="https://webtag.io/banner.png" />
+		<meta property="og:title" content="Webtag" />
+		<meta property="og:description" content="A free text-based bookmarking website." />
+		<title>Webtag</title>
+		<!-- Site scripts & styles -->
+		<link href="/style.css" rel="stylesheet" />
+
+		<script defer src="/vue.global.prod.js"></script>
+		<script defer src="/axios.min.js"></script>
+		<script defer src="/page.js"></script>
+		<script defer src="/api/csrf.js"></script>
+		<script defer src="/script.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<div id="app-containter" class="wrap" v-bind:style="'visibility:visible;'">
+				<!-- <section id="toast" v-bind:class="toast.type + (toast.message ? ' show' : '')" v-on:click="toast.message = ''">
+					{{toast.message}}
+				</section> -->
+
+				<section class="page" v-if="page === 'intro'">
+					<nav>&nbsp;</nav>
+					<h1 class="page-title">Webtag</h1>
+					<h2>A free text-based bookmarking website.</h2>
+
+					<h3>Features</h3>
+
+					<ul>
+						<li>Plain-text based bookmarking. No fancy images or graphics.</li>
+						<li>Tags. Organize your bookmarks with multiple tags.</li>
+						<li>Private. All bookmarks are private by default.</li>
+						<li>Full-text search*. But only on readable contents of the page.</li>
+						<li>Export bookmarks. Not happy with us? Export all your bookmarks anytime.</li>
+						<li>Import bookmarks. Bring in all your bookmarks from other services or browsers.</li>
+						<li>Works on any device with an internet connection and browser.</li>
+						<li>Free unlimited bookmarks. No limits on storage.</li>
+					</ul>
+					<div><a href="/signup" class="bold">Create an account</a></div>
+					<br />
+					<div>Already have an account? <a href="/login">Log in</a></div>
+				</section>
+
+				<main v-if="page !== 'intro'">
+					<nav>
+						<a href="/">Home</a>
+						<span class="separator">&middot;</span>
+						<a href="/signup" v-if="!isloggedIn">Sign up</a>
+						<a href="/tags" v-if="isloggedIn">Tags</a>
+						<span class="separator">&middot;</span>
+						<a href="/login" v-if="!isloggedIn">Log in</a>
+						<a href="/account" v-if="isloggedIn">Account</a>
+					</nav>
+
+					<section v-if="page === 'signup'">
+						<h1 class="page-title">Create an account</h1>
+						<label for="username">Username</label>
+						<input type="text" id="username" placeholder="Username" v-model="newAccount.handle" />
+						<label for="email">E-mail address</label>
+						<input type="email" id="email" placeholder="Email address" v-model="newAccount.email" />
+						<label for="password">Password</label>
+						<input
+							type="password"
+							id="password"
+							placeholder="Password"
+							v-model="newAccount.password"
+							v-on:keydown.enter="signUp"
+						/>
+						<button class="bold" v-on:click="signUp">Sign up</button>
+						<div class="small light">Already got an account? <a href="/login">Log in</a></div>
+					</section>
+
+					<section v-if="page === 'login'">
+						<h1 class="page-title">Log in</h1>
+						<label for="username">Username</label>
+						<input type="text" id="username" placeholder="Enter your Username" v-model="authCreds.username" />
+
+						<label for="password">Password</label>
+						<input
+							type="password"
+							id="password"
+							placeholder="Password"
+							v-model="authCreds.password"
+							v-on:keydown.enter="signIn"
+						/>
+						<button class="bold" v-on:click="signIn">Log in</button>
+						<div class="small"><a href="javascript:void(0)" v-on:click="forgotPassword">Forgot password?</a></div>
+						<div class="small light">Don't have an account yet? <a href="/signup">Sign up</a></div>
+					</section>
+
+					<section v-if="page === 'account'">
+						<h1 class="page-title">Your account</h1>
+						<label for="username">Your username</label>
+						<input type="text" id="username" v-model="myAccount.username" v-bind:disabled="true" />
+						<label for="email">Your e-mail address</label>
+						<input type="email" id="email" placeholder="Email address" v-model="myAccount.email" />
+						<label for="password">Password</label>
+						<input type="password" id="password" placeholder="Enter new password" v-model="myAccount.password" />
+						<label for="defaultTags">Default tags</label>
+						<input
+							type="text"
+							id="defaultTags"
+							placeholder="Enter some tags"
+							v-model="myAccount.defaultTags"
+							class="hasHelperText"
+						/>
+						<div class="small light helperText">Will be auto-added when bookmarking</div>
+						<label for="publicTags">Public tags</label>
+						<input
+							type="text"
+							id="publicTags"
+							placeholder="Enter some tags"
+							v-model="myAccount.publicTags"
+							class="hasHelperText"
+						/>
+						<div class="small light helperText">
+							Bookmarks tagged with these tags can be publicly accessible at <br />
+							https://webtag.io/:username/public/:publicTag
+						</div>
+						<label for="password">Password</label>
+						<input type="password" id="password" placeholder="Enter new password" v-model="myAccount.password" />
+						<button class="bold" v-on:click="updateAccount">Update account</button>
+						<br /><br />
+						<button class="red" v-on:click="logOut()">Log out</button>
+						<hr />
+						<h3>Experimental features</h3>
+						<div class="bold">Enable push notifications</div>
+						You will receive a push notification when someone tags your on their bookmark. <br />
+						<label class="switch">
+							<input type="checkbox" />
+							<span class="slider"></span>
+						</label>
+					</section>
+
+					<section v-if="page === 'home'"></section>
+					<!-- <section  v-if="page === 'read'">
+						<h1 class="page-title">Article title</h1>
+							<div v-html="linkify(read.body)"></div>
+							<br/><br/>
+							<a v-bind:href="">Open original URL</a>
+						</div>
+					</section> -->
+
+					<!-- <section  v-if="page === '404'">
+						<h1 class="page-title">Page not found</h1>
+						<div>The page you are looking for does not exist.</div>
+						<a href="/">Back to home</a>
+					</section> -->
+				</main>
+			</div>
+		</div>
+		<footer class="small light wrap">
+			<a href="/terms.html" target="_blank">Terms</a> &middot;
+			<a href="/privacy.html" target="_blank">Privacy</a>
+		</footer>
+	</body>
+</html>
