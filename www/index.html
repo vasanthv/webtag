@@ -173,6 +173,9 @@
 								<a v-bind:href="'/edit?id='+bookmark._id">edit</a>
 							</div>
 						</div>
+						<div v-if="loading" class="loader"></div>
+
+						<button class="link bold" v-on:click="getBookmarks" v-if="showLoadMore">Load more &darr;</button>
 					</section>
 
 					<section v-if="page === 'tags'">
@@ -182,6 +185,7 @@
 								<a v-bind:href="'/?tags='+tag.tag">{{tag.tag}}</a> <span class="small light">({{tag.count}})</span>
 							</div>
 						</div>
+						<div v-if="loading" class="loader"></div>
 					</section>
 
 					<section v-if="page === 'newBookmark'">

@@ -148,9 +148,15 @@ const App = Vue.createApp({
 				});
 		},
 		getTags() {
-			axios.get("/api/tags").then((response) => {
-				this.tags = response.data.tags;
-			});
+			this.loading = true;
+			axios
+				.get("/api/tags")
+				.then((response) => {
+					this.tags = response.data.tags;
+				})
+				.finally(() => {
+					this.loading = false;
+				});
 		},
 		getBookmarks() {
 			this.loading = true;
