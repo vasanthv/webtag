@@ -27,6 +27,7 @@ const initApp = async () => {
 };
 
 const defaultState = function () {
+	const searchParams = new URLSearchParams(window.location.search);
 	return {
 		online: navigator.onLine,
 		visible: document.visibilityState === "visible",
@@ -39,13 +40,13 @@ const defaultState = function () {
 		myAccount: {},
 		username: window.localStorage.username,
 		bookmarks: [],
-		query: "",
-		queryTags: "",
+		tags: {},
+		query: searchParams.get("q"),
+		queryTags: searchParams.get("tags"),
 		newBookmark: { url: "", tags: "" },
 		updateBookmark: { id: "", url: "", title: "", tags: "" },
 		showLoadMore: false,
 		pushSubscribed: window.localStorage.pushSubscribed,
-		read: {},
 	};
 };
 
@@ -65,6 +66,9 @@ const App = Vue.createApp({
 			let className = "size";
 			className += this.contacts.length < 8 ? "10" : this.contacts.length < 18 ? "20" : "50";
 			return className;
+		},
+		tagsArray() {
+			return Object.keys(this.tags).map((tag) => ({ tag, count: this.tags[tag] }));
 		},
 	},
 	methods: {
@@ -133,27 +137,52 @@ const App = Vue.createApp({
 				this.setToast(response.data.message, "success");
 			});
 		},
-		getContacts() {
-			axios.get("/api/contacts").then((response) => {
-				this.contacts = response.data.contacts;
+		getTags() {
+			axios.get("/api/tags").then((response) => {
+				this.tags = response.data.tags;
 			});
 		},
-		getBlockedContacts() {
-			axios.get("/api/contacts/blocked").then((response) => {
-				this.blockedContacts = response.data.blocked;
-			});
-		},
-		fetchProfile(username) {
+		getBookmarks() {
+			this.loading = true;
+			const params = { q: this.query, tags: this.queryTags };
+			if (this.bookmarks.length > 0) {
+				params["skip"] = this.bookmarks.length;
+			}
 			axios
-				.get(`/api/profile/${username}`)
+				.get("/api/bookmarks", { params })
 				.then((response) => {
-					this.profile = response.data;
-				})
-				.catch((err) => {
-					if (err.response.status === 404) {
-						this.page = "404";
+					if (response.data.bookmarks.length > 0) {
+						response.data.bookmarks.forEach((m) => this.bookmarks.push(m));
 					}
+					this.showLoadMore = response.data.bookmarks.length == 50;
+				})
+				.finally(() => {
+					this.loading = false;
 				});
+		},
+		getBookmark(id) {
+			axios.get(`/api/bookmarks/${id}`).then((response) => {
+				if (response.data.bookmark) {
+					this.updateBookmark = { ...this.updateBookmark, ...response.data.bookmark };
+				}
+			});
+		},
+		saveBookmark() {
+			const { id, title, tags } = this.updateBookmark;
+			axios.put(`/api/bookmarks/${id}`, { title, tags: tags.join(",") }).then((response) => {
+				this.setToast(response.data.message, "success");
+			});
+		},
+		search(e) {
+			e.preventDefault();
+			const searchParams = new URLSearchParams(window.location.search);
+			searchParams.set("q", this.query);
+			window.location.search = searchParams.toString();
+		},
+		addBookmark() {
+			axios.post("/api/bookmarks", { ...this.newBookmark }).then((response) => {
+				this.setToast(response.data.message, "success");
+			});
 		},
 		async subscribeToPush() {
 			if (swReg) {
@@ -179,109 +208,24 @@ const App = Vue.createApp({
 				}
 			}
 		},
-		clearSlapText() {
-			this.slapText = "";
-			this.resetInputHeight();
+		displayTags(tags) {
+			return tags.map((tag) => (tag.startsWith("@") ? tag : `<a href="/?tags=${tag}">#${tag}</a>`)).join(" ");
 		},
-		resetInputHeight() {
-			const textarea = document.querySelector("#pustTextBox textarea");
-			if (this.slapText.length > 0) {
-				textarea.style.height = textarea.scrollHeight + "px";
-			} else {
-				textarea.style.height = "auto";
-			}
+		displayDate(datestring) {
+			const seconds = Math.floor((new Date() - new Date(datestring)) / 1000);
+			let interval = seconds / 31536000;
+			if (interval > 1) return Math.floor(interval) + "Y";
+			interval = seconds / 2592000;
+			if (interval > 1) return Math.floor(interval) + "M";
+			interval = seconds / 86400;
+			if (interval > 1) return Math.floor(interval) + "d";
+			interval = seconds / 3600;
+			if (interval > 1) return Math.floor(interval) + "h";
+			interval = seconds / 60;
+			if (interval > 1) return Math.floor(interval) + "m";
+			return "now";
 		},
-		slapBtnHandler(username) {
-			if (this.slapText) {
-				username ? this.sendSlap(username, this.slapText) : this.sendSlapToAll(this.slapText);
-			} else if (username) {
-				this.sendSlap(username);
-			} else {
-				this.sendSlapToAll("");
-			}
-		},
-		openQuickieDraw(username) {
-			if (username) {
-				this.slapUser = username;
-			}
-		},
-		sendSlapToAll(text) {
-			if (!this.isloggedIn) return this.setToast("Please log in.", "error");
-			if (!text) return this.setToast("Empty text", "error");
-			axios.post(`/api/slap/all`, { text }).then((response) => {
-				this.setToast(response.data.message, "success");
-				this.getContacts();
-				this.clearSlapText();
-			});
-			this.userEvent("slap-all");
-		},
-		sendSlap(username, text) {
-			if (!this.isloggedIn) return this.setToast("Please log in.", "error");
-			axios.post(`/api/slap/@${username}`, { text }).then((response) => {
-				this.setToast(response.data.message, "success");
-				this.getContacts();
-			});
-			this.userEvent("slap");
-		},
-		clearSlapUser() {
-			this.slapUser = "";
-			window.history.pushState({}, document.title, "/");
-		},
-		addContact(identifier) {
-			if (!this.isloggedIn) return this.setToast("Please log in.", "error");
-			axios.post(`/api/contact/add`, { identifier }).then((response) => {
-				this.setToast(response.data.message, "success");
-				this.contactText = "";
-				if (this.page === "home") this.getContacts();
-				else if (this.page === "profile") this.fetchProfile(this.profile.username);
-			});
-			this.userEvent("addContact");
-		},
-		removeContact(username) {
-			if (!this.isloggedIn) return this.setToast("Please log in.", "error");
-			axios.post(`/api/contact/remove`, { username }).then((response) => {
-				this.setToast(response.data.message, "success");
-				if (this.page === "home") this.getContacts();
-			});
-		},
-		blockContact(username) {
-			if (!this.isloggedIn) return this.setToast("Please log in.", "error");
-			axios.post(`/api/contact/block/@${username}`).then((response) => {
-				this.setToast(response.data.message, "success");
-				if (this.page === "home") this.getContacts();
-				else if (this.page === "profile") this.fetchProfile(username);
-			});
-		},
-		unblockContact(username) {
-			if (!this.isloggedIn) return this.setToast("Please log in.", "error");
-			axios.post(`/api/contact/unblock/@${username}`).then((response) => {
-				this.setToast(response.data.message, "success");
-				this.getBlockedContacts();
-			});
-		},
-		inviteFriend() {
-			axios.post("/api/invite", { email: this.inviteEmail }).then((response) => {
-				this.setToast(response.data.message, "success");
-				this.getMe("?invitees=true");
-				this.inviteEmail = "";
-			});
-			this.userEvent("invite");
-		},
-		linkify: function (str) {
-			if (!str) return "";
-			return linkifyHtml(str, {
-				attributes: {
-					rel: "noopener noreferrer",
-				},
-				target: {
-					url: "_blank",
-				},
-				formatHref: {
-					mention: (href) => `@${href.substring(1)}`,
-					// hashtag: (href) => href.substring(1),
-				},
-			});
-		},
+
 		logOut(autoSignOut) {
 			const localClear = () => {
 				window.localStorage.clear();
@@ -345,7 +289,7 @@ page("/", (ctx) => {
 		if (ctx.querystring) {
 			const urlParams = new URLSearchParams(ctx.querystring);
 			App.query = urlParams.get("q");
-			App.tags = urlParams.get("tags");
+			App.queryTags = urlParams.get("tags");
 		}
 		App.getBookmarks();
 	}
@@ -361,18 +305,26 @@ page("/login", () => {
 	else App.page = "login";
 });
 
-page("/tags", (ctx) => {
-	console.log(ctx.querystring);
+page("/tags", () => {
 	if (!App.isloggedIn) return page.redirect("/login");
 	App.page = "tags";
-	App.fetchTags();
+	App.getTags();
 });
 
 page("/bookmark", (ctx) => {
-	console.log(ctx.querystring);
 	if (!App.isloggedIn) return page.redirect("/login");
-	App.page = "bookmark";
-	App.fetchTags();
+	App.page = "newBookmark";
+});
+
+page("/edit", (ctx) => {
+	if (!App.isloggedIn) return page.redirect("/login");
+	if (ctx.querystring) {
+		const urlParams = new URLSearchParams(ctx.querystring);
+		if (!urlParams.get("id")) return page.redirect("/");
+		App.updateBookmark.id = urlParams.get("id");
+	}
+	App.page = "editBookmark";
+	App.getBookmark(App.updateBookmark.id);
 });
 
 page("/@:username/public/:tag", (r) => {

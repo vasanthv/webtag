@@ -52,7 +52,7 @@ router.post("/login", helper.rateLimit({ max: 5 }), model.logIn);
 router.post("/reset", helper.rateLimit({ max: 5 }), model.resetPassword);
 
 router.use(helper.attachUsertoRequest);
-router.use(["/bookmark", "/bookmarks/:id", "/bookmarks"], helper.attachUsertoRequestFromAPIKey);
+router.use(["/bookmarks/:id", "/bookmarks"], helper.attachUsertoRequestFromAPIKey);
 router.use(helper.isUserAuthed);
 
 router.put("/account", model.updateAccount);
@@ -63,7 +63,7 @@ router.post("/logout", model.logOut);
 
 router.get("/me", model.me);
 
-router.post("/bookmark", model.addBookmark);
+router.post("/bookmarks", model.addBookmark);
 router.put("/bookmarks/:id", model.updateBookmark);
 router.delete("/bookmarks/:id", model.deleteBookmark);
 router.put("/bookmarks/:id/removeme", model.removeMeFromTag);

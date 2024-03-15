@@ -56,7 +56,7 @@ const getValidTags = (tagString) => {
 };
 const randomString = () => "_" + Math.random().toString(36).substr(2, 9);
 const sanitizeText = (text) => {
-	if (!text) "";
+	if (!text) return "";
 	const tagsToReplace = { "&": "&amp;", "<": "&lt;", ">": "&gt;" };
 	const replaceTag = (tag) => tagsToReplace[tag] || tag;
 	const safe_tags_replace = (str) => str.replace(/[&<>]/g, replaceTag);
@@ -146,29 +146,6 @@ const sendPushNotification = async (recipient, title, body) => {
 	}
 };
 
-const saveBookmark = async (url, tags, user, titleText = "") => {
-	let title = titleText ?? url.slice(0, 30) + (url.length > 30 ? "..." : "");
-
-	// Get contents of the URL
-	const urlContents = await getURLContents(url);
-
-	if (urlContents && !titleText) {
-		const _title = getPageTitle(urlContents);
-		title = (_title ?? title).substring(0, 160);
-	}
-
-	const newBookmark = await new Bookmarks({
-		url,
-		title,
-		createdOn: new Date(),
-		updatedOn: new Date(),
-		createdBy: user._id,
-		tags,
-	}).save();
-
-	return newBookmark;
-};
-
 //Throws a error which can be usernamed and changed to HTTP Error in the Express js Error handling middleware.
 const httpError = (code, message) => {
 	code = code ? code : 500;
@@ -199,5 +176,4 @@ module.exports = {
 	rateLimit,
 	speedLimiter,
 	sendPushNotification,
-	saveBookmark,
 };

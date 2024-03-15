@@ -1,14 +1,13 @@
 :root {
 	--background: #ffffff;
+	--background-light: #dfdfdf;
 	--text: #111111;
 	--text-light: #555555;
 	--red: #c0392b;
 	--green: #27ae60;
 	--blue: #0077ff;
 }
-* {
-	outline: 0;
-}
+
 html {
 	-webkit-overflow-scrolling: touch;
 }
@@ -24,7 +23,7 @@ body {
 a,
 a:focus,
 a:active {
-	color: var(--blue);
+	color: #2a66c6;
 	text-decoration: none;
 }
 a:hover {
@@ -33,8 +32,9 @@ a:hover {
 footer {
 	text-align: center;
 	padding: 2rem 1rem !important;
-	font-size: 0.9rem;
-	color: #363636;
+}
+footer a {
+	color: inherit;
 }
 label {
 	font-weight: bold;
@@ -42,7 +42,6 @@ label {
 input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="search"],
 textarea {
 	display: block;
 	border: 0.1rem solid var(--text-light);
@@ -57,12 +56,23 @@ textarea {
 	box-sizing: border-box;
 	margin-bottom: 1rem;
 }
+input:disabled {
+	background: var(--background-light);
+	cursor: not-allowed;
+}
 input.hasHelperText {
 	margin-bottom: 0rem;
 }
 input[type="search"] {
+	background: var(--background-light);
+	color: var(--text);
+	border: none;
 	display: inline-block;
-	margin-right: 0.25rem;
+	border-radius: 0.2rem;
+	box-sizing: border-box;
+	margin-bottom: 1rem;
+	padding: 0.25rem 0.5rem;
+	font-size: 1rem;
 }
 ::placeholder {
 	opacity: 0.7;
@@ -151,7 +161,16 @@ section h1 {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
-	margin-bottom: 1rem;
+	margin: auto auto 1rem 0px;
+}
+.bookmark {
+	margin: 1rem auto 1.5rem;
+}
+.bookmark .link {
+	font-size: 1.2rem;
+}
+.bookmark .meta a {
+	color: inherit;
 }
 .switch {
 	position: relative;
@@ -230,4 +249,21 @@ section h1 {
 }
 #dragBookmarklet {
 	cursor: move;
+}
+
+@media only screen and (max-width: 600px) {
+	#searchHeader {
+		flex-direction: column;
+	}
+	#searchHeader form {
+		display: block;
+		position: relative;
+		bottom: 0.5rem;
+		width: 100%;
+		margin-bottom: 0.5rem;
+	}
+	input[type="search"] {
+		display: block;
+		width: 100%;
+	}
 }
