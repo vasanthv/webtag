@@ -130,12 +130,22 @@ const App = Vue.createApp({
 				window.localStorage.pushSubscribed = response.data.pushEnabled;
 				this.pushSubscribed = response.data.pushEnabled;
 				if (this.pushSubscribed) this.subscribeToPush();
+
+				this.newBookmark = { tags: this.me.defaultTags.join(", "), url: "" };
 			});
 		},
 		updateAccount() {
-			axios.put("/api/account", { ...this.myAccount }).then((response) => {
-				this.setToast(response.data.message, "success");
-			});
+			const { email, password, defaultTags, publicTags } = this.myAccount;
+			axios
+				.put("/api/account", {
+					email,
+					password,
+					defaultTags: Array.isArray(defaultTags) ? defaultTags.join(",") : defaultTags,
+					publicTags: Array.isArray(publicTags) ? publicTags.join(",") : publicTags,
+				})
+				.then((response) => {
+					this.setToast(response.data.message, "success");
+				});
 		},
 		getTags() {
 			axios.get("/api/tags").then((response) => {
@@ -167,6 +177,13 @@ const App = Vue.createApp({
 				}
 			});
 		},
+		addBookmark() {
+			axios.post("/api/bookmarks", { ...this.newBookmark }).then((response) => {
+				this.setToast(response.data.message, "success");
+				this.newBookmark = { tags: this.me.defaultTags.join(", "), url: "" };
+				page.redirect("/");
+			});
+		},
 		saveBookmark() {
 			const { id, title, tags } = this.updateBookmark;
 			axios.put(`/api/bookmarks/${id}`, { title, tags: tags.join(",") }).then((response) => {
@@ -179,10 +196,14 @@ const App = Vue.createApp({
 			searchParams.set("q", this.query);
 			window.location.search = searchParams.toString();
 		},
-		addBookmark() {
-			axios.post("/api/bookmarks", { ...this.newBookmark }).then((response) => {
-				this.setToast(response.data.message, "success");
-			});
+		deleteBookmark() {
+			if (confirm("Are you sure, you want to delete this bookmark? There is no undo.")) {
+				const { id } = this.updateBookmark;
+				axios.delete(`/api/bookmarks/${id}`).then((response) => {
+					this.setToast(response.data.message, "success");
+					page.redirect("/");
+				});
+			}
 		},
 		async subscribeToPush() {
 			if (swReg) {

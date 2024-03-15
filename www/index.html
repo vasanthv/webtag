@@ -36,9 +36,9 @@
 	<body>
 		<div id="app">
 			<div id="app-containter" class="wrap" v-bind:style="'visibility:visible;'">
-				<!-- <section id="toast" v-bind:class="toast.type + (toast.message ? ' show' : '')" v-on:click="toast.message = ''">
+				<section id="toast" v-bind:class="toast.type + (toast.message ? ' show' : '')" v-on:click="toast.message = ''">
 					{{toast.message}}
-				</section> -->
+				</section>
 
 				<section class="page" v-if="page === 'intro'">
 					<nav>&nbsp;</nav>
@@ -197,7 +197,7 @@
 					</section>
 
 					<section v-if="page === 'editBookmark'">
-						<h1 class="page-title">New bookmark</h1>
+						<h1 class="page-title">Edit bookmark</h1>
 						<label for="url">URL</label>
 						<input type="text" id="url" placeholder="Enter a URL" v-model="updateBookmark.url" disabled />
 
@@ -208,7 +208,10 @@
 						<input type="text" id="tags" placeholder="Enter tags" v-model="updateBookmark.tags" class="hasHelperText" />
 						<div class="small light helperText">Note: Only alphanumeric; Comma or space separated</div>
 
-						<button class="bold" v-on:click="saveBookmark">Update bookmark</button>
+						<div class="flex">
+							<div class="flex-1"><button class="bold" v-on:click="saveBookmark">Update bookmark</button></div>
+							<button class="link red bold" v-on:click="deleteBookmark">Delete</button>
+						</div>
 					</section>
 
 					<section v-if="page === '404'">

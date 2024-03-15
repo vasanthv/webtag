@@ -77,8 +77,7 @@ input[type="search"] {
 ::placeholder {
 	opacity: 0.7;
 }
-button,
-a.button {
+button {
 	display: inline-block;
 	background: var(--text);
 	color: var(--background);
@@ -97,6 +96,14 @@ button:disabled {
 }
 button.red {
 	background: var(--red);
+}
+button.link {
+	background: none;
+	color: var(--text);
+}
+button.link.red {
+	background: none;
+	color: var(--red);
 }
 code {
 	display: block;
@@ -219,36 +226,29 @@ section h1 {
 	visibility: hidden;
 }
 #toast {
+	background-color: var(--text);
+	color: var(--background);
+	text-align: center;
+	box-sizing: border-box;
 	position: fixed;
-	top: 1rem;
+	z-index: 10;
 	left: 0px;
 	right: 0px;
-	width: 100%;
-	z-index: 10;
-	max-width: 480px;
-	margin-inline: auto;
-	padding: 0.5rem 1rem;
-	border-radius: 0.25rem;
+	top: 0rem;
+	max-height: 0;
+	margin: auto;
+	overflow: hidden;
+	font-size: 1em;
+	transition: max-height 0.25s ease-in;
 }
-#desc {
-	font-size: 1.3rem;
+#toast.show {
+	max-height: 5rem;
 }
-#pagination a {
-	font-size: 0.9rem;
-	font-weight: 600;
+#toast.error {
+	background: var(--red);
 }
-#newBookmark input[type="text"],
-#newBookmark textarea {
-	max-width: 640px;
-}
-#newBookmark button {
-	width: 10rem;
-}
-#search {
-	display: none;
-}
-#dragBookmarklet {
-	cursor: move;
+#toast.success {
+	background: var(--green);
 }
 
 @media only screen and (max-width: 600px) {
