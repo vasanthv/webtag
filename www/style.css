@@ -175,6 +175,9 @@ section h1 {
 }
 .bookmark .link {
 	font-size: 1.2rem;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
 }
 .bookmark .meta a {
 	color: inherit;

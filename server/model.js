@@ -287,10 +287,7 @@ const getBookmarks = async (req, res, next) => {
 
 		let query = { $or: [{ createdBy: req.user._id }, { tags: `@${req.user.username}` }] };
 
-		if (q)
-			query = {
-				$and: [{ $or: query["$or"] }, { $or: [{ $text: { $search: q } }, { tags: { $in: q.split(" ") } }] }],
-			};
+		if (q) query = { $and: [{ $or: query["$or"] }, { $text: { $search: q } }] };
 
 		if (tags.length > 0) query = { ...query, tags: { $in: tags } };
 

@@ -191,7 +191,7 @@ const App = Vue.createApp({
 		},
 		saveBookmark() {
 			const { id, title, tags } = this.updateBookmark;
-			axios.put(`/api/bookmarks/${id}`, { title, tags: tags.join(",") }).then((response) => {
+			axios.put(`/api/bookmarks/${id}`, { title, tags }).then((response) => {
 				this.setToast(response.data.message, "success");
 			});
 		},
@@ -237,7 +237,7 @@ const App = Vue.createApp({
 		displayTags(tags) {
 			return tags
 				.filter((t) => !!t)
-				.map((tag) => (tag.startsWith("@") ? tag : `<a href="/?tags=${tag}">#${tag}</a>`))
+				.map((tag) => (tag.startsWith("@") ? tag : `<a href="/?tags=${tag}">#${tag.substr(0, 26)}</a>`))
 				.join(" ");
 		},
 		displayDate(datestring) {
@@ -316,11 +316,9 @@ page("/", (ctx) => {
 	App.page = App.isloggedIn ? "home" : "intro";
 
 	if (App.isloggedIn) {
-		if (ctx.querystring) {
-			const urlParams = new URLSearchParams(ctx.querystring);
-			App.query = urlParams.get("q");
-			App.queryTags = urlParams.get("tags");
-		}
+		const urlParams = new URLSearchParams(ctx.querystring);
+		App.query = urlParams.get("q");
+		App.queryTags = urlParams.get("tags");
 		App.getBookmarks();
 	}
 });
@@ -353,11 +351,9 @@ page("/bookmark", () => {
 page("/edit", (ctx) => {
 	document.title = "Edit bookmark: Webtag";
 	if (!App.isloggedIn) return page.redirect("/login");
-	if (ctx.querystring) {
-		const urlParams = new URLSearchParams(ctx.querystring);
-		if (!urlParams.get("id")) return page.redirect("/");
-		App.updateBookmark.id = urlParams.get("id");
-	}
+	const urlParams = new URLSearchParams(ctx.querystring);
+	if (!urlParams.get("id")) return page.redirect("/");
+	App.updateBookmark.id = urlParams.get("id");
 	App.page = "editBookmark";
 	App.getBookmark(App.updateBookmark.id);
 });
