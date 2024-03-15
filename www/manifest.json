@@ -20,7 +20,7 @@
 			"sizes": "any"
 		}
 	],
-	"theme_color": "#0077ff",
+	"theme_color": "#EE4455",
 	"background_color": "#fff",
 	"display": "standalone",
 	"start_url": "/",
