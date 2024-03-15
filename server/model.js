@@ -368,7 +368,7 @@ const importBookmarks = async (req, res, next) => {
 				createdOn: new Date(),
 				updatedOn: new Date(),
 				createdBy: req.user._id,
-				tags: bookmark.attr("tags"),
+				tags: bookmark.attr("tags") || undefined,
 			});
 		});
 
