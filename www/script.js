@@ -235,7 +235,10 @@ const App = Vue.createApp({
 			}
 		},
 		displayTags(tags) {
-			return tags.map((tag) => (tag.startsWith("@") ? tag : `<a href="/?tags=${tag}">#${tag}</a>`)).join(" ");
+			return tags
+				.filter((t) => !!t)
+				.map((tag) => (tag.startsWith("@") ? tag : `<a href="/?tags=${tag}">#${tag}</a>`))
+				.join(" ");
 		},
 		displayDate(datestring) {
 			const seconds = Math.floor((new Date() - new Date(datestring)) / 1000);
