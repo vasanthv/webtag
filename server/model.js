@@ -48,7 +48,7 @@ const logIn = async (req, res, next) => {
 
 		const user = await Users.findOne({ username: { $regex: new RegExp(`^${username}$`, "i") }, password }).exec();
 
-		if (!user) helper.httpError(400, "Invalid user credentials");
+		if (!user) return helper.httpError(400, "Invalid user credentials");
 
 		const userAgent = req.get("user-agent");
 
@@ -100,14 +100,13 @@ const resetPassword = async (req, res, next) => {
 
 const me = async (req, res, next) => {
 	try {
-		const { username, email, createdOn, apiKeys, defaultTags, publicTags, devices } = req.user;
+		const { username, email, createdOn, apiKeys, defaultTags, devices } = req.user;
 
 		res.json({
 			username,
 			email,
 			createdOn,
 			defaultTags,
-			publicTags,
 			apiKeys,
 			pushEnabled: devices.some((d) => d.token === req.token && !!d.pushCredentials),
 		});
@@ -125,9 +124,8 @@ const updateAccount = async (req, res, next) => {
 		const password = req.body.password ? await helper.getValidPassword(req.body.password) : null;
 
 		const defaultTags = req.body.defaultTags ? helper.getValidTags(req.body.defaultTags) : [];
-		const publicTags = req.body.publicTags ? helper.getValidTags(req.body.publicTags) : [];
 
-		const updateFields = { defaultTags, publicTags };
+		const updateFields = { defaultTags };
 		if (password) updateFields["password"] = password;
 
 		if (email && email !== req.user.email) {
@@ -356,6 +354,51 @@ const getTags = async (req, res, next) => {
 	}
 };
 
+const importBookmarks = async (req, res, next) => {
+	try {
+		if (!req.file) return helper.httpError(400, "Invalid file");
+
+		const $ = cheerio.load(req.file.buffer.toString());
+		const bookmarks = [];
+		$("a").each((i, a) => {
+			const bookmark = $(a);
+			bookmarks.push({
+				url: bookmark.attr("href"),
+				title: bookmark.text(),
+				createdOn: new Date(),
+				updatedOn: new Date(),
+				createdBy: req.user._id,
+				tags: bookmark.attr("tags"),
+			});
+		});
+
+		const response = await Bookmarks.insertMany(bookmarks);
+
+		res.json({ message: `${response.length} bookmarks imported` });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const exportBookmarks = async (req, res, next) => {
+	try {
+		let query = { $or: [{ createdBy: req.user._id }, { tags: `@${req.user.username}` }] };
+
+		const bookmarks = await Bookmarks.find(query)
+			.select("url title createdOn updatedOn tags")
+			.sort("-updatedOn")
+			.exec();
+
+		const bookmarkFileContents = helper.getBookmarkFileContents(bookmarks);
+
+		let date = new Date().toISOString().split("T")[0];
+
+		res.status(200).attachment(`currl-bookmarks-${date}.html`).send(bookmarkFileContents);
+	} catch (error) {
+		next(error);
+	}
+};
+
 const logOut = async (req, res, next) => {
 	try {
 		await Users.updateOne({ _id: req.user._id }, { $pull: { devices: { token: req.token } } });
@@ -383,5 +426,7 @@ module.exports = {
 	getBookmarks,
 	getBookmark,
 	getTags,
+	importBookmarks,
+	exportBookmarks,
 	logOut,
 };

@@ -43,7 +43,7 @@ const defaultState = function () {
 		tags: {},
 		query: searchParams.get("q"),
 		queryTags: searchParams.get("tags"),
-		newBookmark: { url: "", tags: "" },
+		newBookmark: { url: searchParams.get("url"), tags: window.localStorage.tags },
 		updateBookmark: { id: "", url: "", title: "", tags: "" },
 		showLoadMore: false,
 		pushSubscribed: window.localStorage.pushSubscribed,
@@ -130,8 +130,7 @@ const App = Vue.createApp({
 				window.localStorage.pushSubscribed = response.data.pushEnabled;
 				this.pushSubscribed = response.data.pushEnabled;
 				if (this.pushSubscribed) this.subscribeToPush();
-
-				this.newBookmark = { tags: this.me.defaultTags.join(", "), url: "" };
+				window.localStorage.tags = this.me.defaultTags.join(", ");
 			});
 		},
 		updateAccount() {
@@ -310,6 +309,7 @@ page("*", (ctx, next) => {
 
 /* Routes declaration */
 page("/", (ctx) => {
+	document.title = "Webtag - A free text-based bookmarking.";
 	App.page = App.isloggedIn ? "home" : "intro";
 
 	if (App.isloggedIn) {
@@ -323,27 +323,32 @@ page("/", (ctx) => {
 });
 
 page("/signup", () => {
+	document.title = "Sign up: Webtag";
 	if (App.isloggedIn) return page.redirect("/");
 	else App.page = "signup";
 });
 
 page("/login", () => {
+	document.title = "Log in: Webtag";
 	if (App.isloggedIn) return page.redirect("/");
 	else App.page = "login";
 });
 
 page("/tags", () => {
+	document.title = "My tags: Webtag";
 	if (!App.isloggedIn) return page.redirect("/login");
 	App.page = "tags";
 	App.getTags();
 });
 
-page("/bookmark", (ctx) => {
+page("/bookmark", () => {
+	document.title = "New bookmark: Webtag";
 	if (!App.isloggedIn) return page.redirect("/login");
 	App.page = "newBookmark";
 });
 
 page("/edit", (ctx) => {
+	document.title = "Edit bookmark: Webtag";
 	if (!App.isloggedIn) return page.redirect("/login");
 	if (ctx.querystring) {
 		const urlParams = new URLSearchParams(ctx.querystring);
@@ -354,18 +359,15 @@ page("/edit", (ctx) => {
 	App.getBookmark(App.updateBookmark.id);
 });
 
-page("/@:username/public/:tag", (r) => {
-	App.page = "publicTag";
-	App.fetchPublicBookmarksByTag(r.params.username, r.params.tag);
-});
-
 page("/account", () => {
+	document.title = "My acount: Webtag";
 	if (!App.isloggedIn) return page.redirect("/login");
 	App.page = "account";
 	App.getMe();
 });
 
 page("/*", () => {
+	document.title = "Page not found: Webtag";
 	App.page = "404";
 });
 

@@ -2,12 +2,15 @@ const mongoStore = require("connect-mongo");
 const session = require("express-session");
 const router = require("express").Router();
 const bodyParser = require("body-parser");
+const multer = require("multer");
 const morgan = require("morgan");
 const uuid = require("uuid").v4;
 
 const config = require("./config");
 const model = require("./model");
 const helper = require("./helper");
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Username API requests
 router.use(bodyParser.json());
@@ -69,6 +72,15 @@ router.delete("/bookmarks/:id", model.deleteBookmark);
 router.put("/bookmarks/:id/removeme", model.removeMeFromTag);
 router.get("/bookmarks", model.getBookmarks);
 router.get("/bookmarks/:id", model.getBookmark);
+
+router.post(
+	"/import",
+	helper.rateLimit({ windowMs: 60, max: 5, skipFailedRequests: true }),
+	upload.single("bookmarks"),
+	model.importBookmarks
+);
+
+router.get("/export", model.exportBookmarks);
 
 router.get("/tags", model.getTags);
 

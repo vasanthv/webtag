@@ -1,11 +1,12 @@
 const rateLimiter = require("express-rate-limit");
 const slowDown = require("express-slow-down");
+const Mustache = require("mustache");
 const webPush = require("web-push");
 const crypto = require("crypto");
 const { URL } = require("url");
 
 const config = require("./config");
-const { Users, Bookmarks } = require("./collections").getInstance();
+const { Users } = require("./collections").getInstance();
 
 /**
  * Pure Functions
@@ -61,6 +62,23 @@ const sanitizeText = (text) => {
 	const replaceTag = (tag) => tagsToReplace[tag] || tag;
 	const safe_tags_replace = (str) => str.replace(/[&<>]/g, replaceTag);
 	return safe_tags_replace(text.replace("\b", ""));
+};
+
+/*Bookmark export file contents*/
+const getBookmarkFileContents = (bookmarks) => {
+	const bookmarkFileTemplate = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<!-- This is an automatically generated file.
+     It will be read and overwritten.
+     DO NOT EDIT! -->
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Webtag Bookmarks</TITLE>
+<H1>Webtag Bookmarks</H1>
+<DL><p>
+{{#bookmarks}}
+<DT><A HREF="{{{url}}}" TAGS="{{{tags}}}" ADD_DATE="{{{createdOn}}}" UPDATE_DATE="{{{updatedOn}}}">{{{title}}}</A>
+{{/bookmarks}}
+</DL><p>`;
+	return Mustache.render(bookmarkFileTemplate, { bookmarks });
 };
 
 /* Middlewares */
@@ -165,6 +183,7 @@ module.exports = {
 	getValidTags,
 	randomString,
 	sanitizeText,
+	getBookmarkFileContents,
 	isNewUsername,
 	isNewEmail,
 	hashString,

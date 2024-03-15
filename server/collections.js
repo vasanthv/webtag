@@ -48,7 +48,6 @@ module.exports = (() => {
 				},
 			],
 			defaultTags: [{ type: String }],
-			publicTags: [{ type: String }],
 			apiKeys: [{ type: String, index: true }],
 		});
 

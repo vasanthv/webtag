@@ -23,7 +23,7 @@
 		<meta property="og:image" content="https://webtag.io/banner.png" />
 		<meta property="og:title" content="Webtag" />
 		<meta property="og:description" content="A free text-based bookmarking website." />
-		<title>Webtag</title>
+		<title>Webtag - A free text-based bookmarking.</title>
 		<!-- Site scripts & styles -->
 		<link href="/style.css" rel="stylesheet" />
 
@@ -51,6 +51,7 @@
 						<li>Plain-text based bookmarking. No fancy images or graphics.</li>
 						<li>Tags. Organize your bookmarks with multiple tags.</li>
 						<li>Private. All bookmarks are private by default.</li>
+						<li>Sharing. Tag your friends (@username) to share bookmarks with them.</li>
 						<li>One-click bookmarking. Save bookmarks with a single click, using our bookmarklet.</li>
 						<li>Import bookmarks. Bring in all your bookmarks from other services or browsers.</li>
 						<li>Export bookmarks. Not happy with us? Export all your bookmarks anytime.</li>
@@ -128,18 +129,6 @@
 							class="hasHelperText"
 						/>
 						<div class="small light helperText">Will be auto-added when bookmarking</div>
-						<label for="publicTags">Public tags</label>
-						<input
-							type="text"
-							id="publicTags"
-							placeholder="Enter some tags"
-							v-model="myAccount.publicTags"
-							class="hasHelperText"
-						/>
-						<div class="small light helperText">
-							Bookmarks tagged with these tags can be publicly accessible at <br />
-							https://webtag.io/:username/public/:publicTag
-						</div>
 						<button class="bold" v-on:click="updateAccount">Update account</button>
 						<br /><br />
 						<button class="red" v-on:click="logOut()">Log out</button>
