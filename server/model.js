@@ -176,13 +176,21 @@ const updatePushCredentials = async (req, res, next) => {
 
 		await Users.findOneAndUpdate(
 			{ _id: req.user._id, "devices.token": req.token },
-			{
-				$set: {
-					"devices.$.pushCredentials": credentials,
-				},
-			}
+			{ $set: { "devices.$.pushCredentials": credentials } }
 		);
-		res.json({ message: "Slap credentials updated" });
+		res.json({ message: "Push credentials updated" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const deletePushCredentials = async (req, res, next) => {
+	try {
+		await Users.findOneAndUpdate(
+			{ _id: req.user._id, "devices.token": req.token },
+			{ $unset: { "devices.$.pushCredentials": 1 } }
+		);
+		res.json({ message: "Push credentials updated" });
 	} catch (error) {
 		next(error);
 	}
@@ -416,6 +424,7 @@ module.exports = {
 	newApiKey,
 	deleteApiKey,
 	updatePushCredentials,
+	deletePushCredentials,
 	addBookmark,
 	updateBookmark,
 	deleteBookmark,

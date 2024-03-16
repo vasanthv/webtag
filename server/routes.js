@@ -60,6 +60,7 @@ router.use(helper.isUserAuthed);
 
 router.put("/account", model.updateAccount);
 router.put("/account/pushcredentials", model.updatePushCredentials);
+router.delete("/account/pushcredentials", model.deletePushCredentials);
 router.post("/key", model.newApiKey);
 router.delete("/key/:key", model.deleteApiKey);
 router.post("/logout", model.logOut);
