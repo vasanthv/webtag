@@ -1,11 +1,14 @@
 const express = require("express");
+const dotenv = require("dotenv");
 const morgan = require("morgan");
 const path = require("path");
 const app = express();
 
+// Load emvironment variables
+dotenv.config({ path: path.join(__dirname, ".env") });
+
 const config = require("./server/config");
 const apiRoutes = require("./server/routes");
-// const urlShortenerRoutes = require("./api/url-shortener");
 
 // Set the view engine
 app.set("view engine", "ejs");
