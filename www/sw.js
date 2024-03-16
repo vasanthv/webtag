@@ -11,25 +11,20 @@ self.addEventListener("install", function (e) {
 		"/manifest.json",
 		"/style.css",
 		"/vue.global.prod.js",
-		"/linkify.min.js",
 		"/axios.min.js",
 		"/page.js",
 		"/script.js",
 		"/index.html",
-		"/about.html",
 		"/terms.html",
 		"/privacy.html",
-		"/signup",
-		"/login",
-		"/read",
-		"/account",
-		"/blocked",
 	];
 
 	// Deleting the previous version of cache
 	e.waitUntil(
 		caches.keys().then(function (cacheNames) {
-			return Promise.all(cacheNames.filter((cacheName) => cacheName != currentCacheName).map((cacheName) => caches.delete(cacheName)));
+			return Promise.all(
+				cacheNames.filter((cacheName) => cacheName != currentCacheName).map((cacheName) => caches.delete(cacheName))
+			);
 		})
 	);
 
@@ -59,11 +54,11 @@ self.addEventListener("push", function (event) {
 	const payload = rawPayload[0] === "{" ? JSON.parse(rawPayload) : rawPayload;
 
 	if (payload.title) {
-		const title = `${payload.title} slapped you`;
+		const title = payload.title;
 		const body = payload.body;
 		const icon = "/icon.png";
 
-		const data = { url: payload.url, appURL: payload.appURL };
+		const data = { url: payload.url };
 
 		event.waitUntil(self.registration.showNotification(title, { body, icon, data }));
 	}

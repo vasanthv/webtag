@@ -47,7 +47,7 @@ const getValidPassword = (password) => {
 	if (password.length < 8) return httpError(400, "Password length should be atleast 8 characters");
 	return hashString(password);
 };
-const getValidTags = (tagString) => {
+const getValidTags = (tagString = "") => {
 	return tagString
 		.substr(0, 100)
 		.replace(/[^a-zA-Z0-9@]/g, ",")
@@ -146,15 +146,20 @@ const isNewEmail = async (email, currentUserId) => {
 };
 
 /* Send link as push notifications */
-const sendPushNotification = async (recipient, title, body) => {
-	const url = `${config.URL}read?title=${title}&body=${encodeURIComponent(body)}`;
-	const payload = JSON.stringify({ title, body, url, appURL: config.URL });
+const sendPushNotification = async (recipients, from, title, url) => {
+	const payload = JSON.stringify({
+		title: `@${from.username} shared a bookmark`,
+		body: title,
+		url,
+	});
 
 	const pushPromises = [];
-	recipient.devices?.forEach((device) => {
-		if (device.pushCredentials) {
-			pushPromises.push(webPush.sendNotification(device.pushCredentials, payload, config.PUSH_OPTIONS));
-		}
+	recipients.forEach((recipient) => {
+		recipient.devices?.forEach((device) => {
+			if (device.pushCredentials) {
+				pushPromises.push(webPush.sendNotification(device.pushCredentials, payload, config.PUSH_OPTIONS));
+			}
+		});
 	});
 
 	try {

@@ -204,7 +204,7 @@ const addBookmark = async (req, res, next) => {
 
 		const url = helper.getValidURL(req.body.url);
 		let title = helper.sanitizeText(req.body.title);
-		const tags = req.body.tags ? helper.getValidTags(req.body.tags) : [];
+		let tags = req.body.tags ? helper.getValidTags(req.body.tags) : [];
 
 		// Check if this URL is bookmarked before
 		let _url = await Bookmarks.findOne({ url, createdBy: req.user._id }).exec();
@@ -213,7 +213,7 @@ const addBookmark = async (req, res, next) => {
 		}
 
 		if (!title) {
-			title = title ?? url.slice(0, 30) + (url.length > 30 ? "..." : "");
+			title = title ? title : url.slice(0, 30) + (url.length > 30 ? "..." : "");
 			// Get title of the URL
 			try {
 				const rawHtmlContents = (await axios.get(url)).data;
@@ -226,6 +226,20 @@ const addBookmark = async (req, res, next) => {
 			}
 		}
 
+		const atMentionedTags = tags.filter((t) => t.startsWith("@")).map((t) => t.substr(1));
+		let mentionedUsers = [];
+
+		console.log({ atMentionedTags });
+		if (atMentionedTags.length > 0) {
+			mentionedUsers = await Users.find({ username: { $in: atMentionedTags } })
+				.select("username devices")
+				.exec();
+			const validMentionedTags = mentionedUsers.map((u) => `@${u.username}`);
+			// allow only valid users to be tagged
+			tags = tags.filter((tag) => (tag.startsWith("@") ? validMentionedTags.includes(tag) : true));
+		}
+		console.log({ mentionedUsers });
+
 		const newBookmark = await new Bookmarks({
 			url,
 			title,
@@ -236,6 +250,10 @@ const addBookmark = async (req, res, next) => {
 		}).save();
 
 		res.json({ message: "Bookmark saved", _id: newBookmark._id });
+
+		if (mentionedUsers.length > 0) {
+			helper.sendPushNotification(mentionedUsers, req.user, title, url);
+		}
 	} catch (error) {
 		next(error);
 	}
@@ -249,7 +267,19 @@ const updateBookmark = async (req, res, next) => {
 
 		const id = req.params.id;
 		const title = (req.body.title ?? "").substring(0, 160);
-		const tags = req.body.tags ? helper.getValidTags(req.body.tags) : [];
+		let tags = req.body.tags ? helper.getValidTags(req.body.tags) : [];
+
+		const atMentionedTags = tags.filter((t) => t.startsWith("@")).map((t) => t.substr(0));
+		let mentionedUsers = [];
+
+		if (atMentionedTags.length > 0) {
+			mentionedUsers = await Users.find({ username: { $in: atMentionedTags } })
+				.select("username")
+				.exec();
+			const validMentionedTags = mentionedUsers.map((u) => `@${u.username}`);
+			// allow only valid users to be tagged
+			tags = tags.filter((tag) => (tag.startsWith("@") ? validMentionedTags.includes(tag) : true));
+		}
 
 		let updateFields = { updatedOn: new Date() };
 		if (title) updateFields = { ...updateFields, title };

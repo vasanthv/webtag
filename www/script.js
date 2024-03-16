@@ -46,6 +46,7 @@ const defaultState = function () {
 		newBookmark: { url: searchParams.get("url"), tags: window.localStorage.tags },
 		updateBookmark: { id: "", url: "", title: "", tags: "" },
 		showLoadMore: false,
+		importFile: null,
 		pushSubscribed: window.localStorage.pushSubscribed === "true",
 	};
 };
@@ -178,7 +179,11 @@ const App = Vue.createApp({
 		getBookmark(id) {
 			axios.get(`/api/bookmarks/${id}`).then((response) => {
 				if (response.data.bookmark) {
-					this.updateBookmark = { ...this.updateBookmark, ...response.data.bookmark };
+					this.updateBookmark = {
+						...this.updateBookmark,
+						...response.data.bookmark,
+						tags: response.data.bookmark.tags.join(","),
+					};
 				}
 			});
 		},
@@ -209,6 +214,34 @@ const App = Vue.createApp({
 					page.redirect("/");
 				});
 			}
+		},
+		setImportFile(e) {
+			this.importFile = e.target.files[0];
+		},
+		importBookmarks() {
+			const formData = new FormData();
+			formData.append("bookmarks", this.importFile);
+			const headers = { "Content-Type": "multipart/form-data" };
+			axios.post("/api/import", formData, { headers }).then((response) => {
+				this.setToast(response.data.message, "success");
+			});
+		},
+		exportBookmarks() {
+			axios({
+				url: "/api/export",
+				method: "GET",
+				responseType: "blob",
+			}).then((response) => {
+				const href = URL.createObjectURL(response.data);
+				const link = document.createElement("a");
+				const date = new Date().toISOString().split("T")[0];
+				link.href = href;
+				link.setAttribute("download", `webtag-bookmarks-${date}.html`);
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				URL.revokeObjectURL(href);
+			});
 		},
 		async subscribeToPush() {
 			if (swReg) {

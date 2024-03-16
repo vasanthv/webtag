@@ -133,6 +133,23 @@
 						<br /><br />
 						<button class="red" v-on:click="logOut()">Log out</button>
 						<hr />
+						<h3>Import bookmarks</h3>
+						<p>
+							You can import bookmarks from
+							<a href="https://hvcc.teamdynamix.com/TDClient/1967/Portal/KB/ArticleDet?ID=144671" target="_blank">
+								any browser</a
+							>.
+						</p>
+						<div><input type="file" name="bookmarks" v-on:change="setImportFile" /></div>
+						<button v-on:click="importBookmarks">Import</button>
+						<hr />
+						<h3>Export your bookmarks</h3>
+						<p>
+							You can export all your bookmarks any time here. You'll get a bookmarks file that can be imported to any
+							browser.
+						</p>
+						<button v-on:click="exportBookmarks">Download your bookmarks</button>
+						<hr />
 						<h3>Experimental features</h3>
 						<div class="bold">Enable push notifications</div>
 						You will receive a push notification when someone tags your on their bookmark. <br />
