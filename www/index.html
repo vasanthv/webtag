@@ -137,7 +137,7 @@
 						<div class="bold">Enable push notifications</div>
 						You will receive a push notification when someone tags your on their bookmark. <br />
 						<label class="switch">
-							<input type="checkbox" />
+							<input type="checkbox" v-on:click="togglePush" v-bind:checked="pushSubscribed" />
 							<span class="slider"></span>
 						</label>
 					</section>

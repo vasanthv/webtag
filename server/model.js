@@ -190,7 +190,7 @@ const deletePushCredentials = async (req, res, next) => {
 			{ _id: req.user._id, "devices.token": req.token },
 			{ $unset: { "devices.$.pushCredentials": 1 } }
 		);
-		res.json({ message: "Push credentials updated" });
+		res.json({ message: "Push credentials deleted" });
 	} catch (error) {
 		next(error);
 	}

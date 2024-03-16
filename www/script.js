@@ -46,7 +46,7 @@ const defaultState = function () {
 		newBookmark: { url: searchParams.get("url"), tags: window.localStorage.tags },
 		updateBookmark: { id: "", url: "", title: "", tags: "" },
 		showLoadMore: false,
-		pushSubscribed: window.localStorage.pushSubscribed,
+		pushSubscribed: window.localStorage.pushSubscribed === "true",
 	};
 };
 
@@ -232,6 +232,19 @@ const App = Vue.createApp({
 					}
 					return false;
 				}
+			}
+		},
+		disablePush() {
+			axios.delete("/api/account/pushcredentials").then(() => {
+				window.localStorage.pushSubscribed = false;
+				this.pushSubscribed = false;
+			});
+		},
+		togglePush(event) {
+			if (event.target.checked) {
+				this.subscribeToPush();
+			} else {
+				this.disablePush();
 			}
 		},
 		displayTags(tags) {
