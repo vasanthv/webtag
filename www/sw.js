@@ -1,8 +1,8 @@
 /**
- * Slap Service worker
+ * Webtag Service worker
  */
 
-const currentCacheName = "slap-v-~VERSION";
+const currentCacheName = "webtag-v-~VERSION";
 
 self.addEventListener("install", function (e) {
 	console.log("Install event triggered. New updates available.");

@@ -176,7 +176,14 @@
 								<span> &middot; </span>
 								<span v-if="bookmark.tags.length > 0" v-html="displayTags(bookmark.tags)"></span>
 								<span v-if="bookmark.tags.length > 0"> &middot; </span>
-								<a v-bind:href="'/edit?id='+bookmark._id">edit</a>
+								<a v-bind:href="'/edit?id='+bookmark._id" v-if="bookmark.createdBy.username === username">edit</a>
+								<a
+									href="javascript:void(0)"
+									v-if="bookmark.createdBy.username !== username"
+									v-on:click="removeMeFromTag(bookmark._id)"
+								>
+									remove
+								</a>
 							</div>
 						</div>
 						<div v-if="loading" class="loader"></div>

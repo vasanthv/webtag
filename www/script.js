@@ -200,6 +200,11 @@ const App = Vue.createApp({
 				this.setToast(response.data.message, "success");
 			});
 		},
+		removeMeFromTag(id) {
+			axios.put(`/api/bookmarks/${id}/removeme`).then((response) => {
+				this.setToast(response.data.message, "success");
+			});
+		},
 		search(e) {
 			e.preventDefault();
 			const searchParams = new URLSearchParams(window.location.search);
