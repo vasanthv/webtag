@@ -152,7 +152,8 @@
 						<hr />
 						<h3>Experimental features</h3>
 						<div class="bold">Enable push notifications</div>
-						You will receive a push notification when someone tags your on their bookmark. <br />
+						You will receive a push notification when someone tags your on their bookmark. Works only on
+						<a href="https://caniuse.com/push-api" target="_blank">supported browsers</a>.<br />
 						<label class="switch">
 							<input type="checkbox" v-on:click="togglePush" v-bind:checked="pushSubscribed" />
 							<span class="slider"></span>
@@ -186,6 +187,7 @@
 								</a>
 							</div>
 						</div>
+						<p v-if="bookmarks.length === 0 && !loading" class="light">No bookmarks to show</p>
 						<div v-if="loading" class="loader"></div>
 
 						<button class="link bold" v-on:click="getBookmarks" v-if="showLoadMore">Load more &darr;</button>
@@ -195,9 +197,11 @@
 						<h1 class="page-title">My tags</h1>
 						<div v-for="(tag, i) in tagsArray" v-bind:key="tag">
 							<div class="link">
-								<a v-bind:href="'/?tags='+tag.tag">{{tag.tag}}</a> <span class="small light">({{tag.count}})</span>
+								<a v-bind:href="'/?tags='+tag.tag">{{tag.tag.substr(0, 26)}}</a>
+								<span class="small light">({{tag.count}})</span>
 							</div>
 						</div>
+						<p v-if="tagsArray.length === 0 && !loading" class="light">No tags to show</p>
 						<div v-if="loading" class="loader"></div>
 					</section>
 
