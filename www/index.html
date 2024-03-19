@@ -163,8 +163,8 @@
 					<section v-if="page === 'home'">
 						<div class="flex space-between" id="searchHeader">
 							<h1 class="page-title flex-1">My bookmarks</h1>
-							<form v-on:submit="search">
-								<input type="search" v-model="query" placeholder="Search..." />
+							<form action="." v-on:submit="searchSubmitHandler">
+								<input type="search" v-model="query" placeholder="Search..." v-on:search="search" />
 							</form>
 						</div>
 						<h3 v-if="queryTags">Tagged: <span v-html="displayTags(queryTags.split(','))"></span></h3>

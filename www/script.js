@@ -205,11 +205,16 @@ const App = Vue.createApp({
 				this.setToast(response.data.message, "success");
 			});
 		},
-		search(e) {
+		searchSubmitHandler(e) {
 			e.preventDefault();
-			const searchParams = new URLSearchParams(window.location.search);
-			searchParams.set("q", this.query);
-			window.location.search = searchParams.toString();
+			e.stopPropagation();
+		},
+		search() {
+			const url = new URL(window.location);
+			url.searchParams.set("q", this.query);
+			history.pushState({}, "", url);
+			this.bookmarks = [];
+			this.getBookmarks();
 		},
 		deleteBookmark() {
 			if (confirm("Are you sure, you want to delete this bookmark? There is no undo.")) {
