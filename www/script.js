@@ -46,7 +46,7 @@ const defaultState = function () {
 		newBookmark: { url: searchParams.get("url"), tags: window.localStorage.tags },
 		updateBookmark: { id: "", url: "", title: "", tags: "" },
 		showLoadMore: false,
-		importFile: null,
+		importFile: { file: null, tags: "" },
 		pushSubscribed: window.localStorage.pushSubscribed === "true",
 	};
 };
@@ -226,13 +226,16 @@ const App = Vue.createApp({
 			}
 		},
 		setImportFile(e) {
-			this.importFile = e.target.files[0];
+			this.importFile.file = e.target.files[0];
 		},
 		importBookmarks() {
 			const formData = new FormData();
-			formData.append("bookmarks", this.importFile);
+			formData.append("bookmarks", this.importFile.file);
+			formData.append("tags", this.importFile.tags);
 			const headers = { "Content-Type": "multipart/form-data" };
 			axios.post("/api/import", formData, { headers }).then((response) => {
+				this.importFile = { file: null, tags: "" };
+				document.getElementById("importFile").value = null;
 				this.setToast(response.data.message, "success");
 			});
 		},

@@ -393,6 +393,8 @@ const importBookmarks = async (req, res, next) => {
 	try {
 		if (!req.file) return helper.httpError(400, "Invalid file");
 
+		let tags = req.body.tags ? helper.getValidTags(req.body.tags) : [];
+
 		const $ = cheerio.load(req.file.buffer.toString());
 		const bookmarks = [];
 		$("a").each((i, a) => {
@@ -403,7 +405,7 @@ const importBookmarks = async (req, res, next) => {
 				createdOn: new Date(),
 				updatedOn: new Date(),
 				createdBy: req.user._id,
-				tags: bookmark.attr("tags") || undefined,
+				tags: bookmark.attr("tags") ? [...helper.getValidTags(bookmark.attr("tags")), ...tags] : tags,
 			});
 		});
 

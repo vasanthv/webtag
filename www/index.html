@@ -140,7 +140,12 @@
 								any browser</a
 							>.
 						</p>
-						<div><input type="file" name="bookmarks" v-on:change="setImportFile" /></div>
+						<div><input type="file" name="bookmarks" id="importFile" v-on:change="setImportFile" /></div>
+						<label for="tags">Enter import tags</label>
+						<input type="text" id="tags" placeholder="Enter tags" v-model="importFile.tags" class="hasHelperText" />
+						<div class="small light helperText">
+							Note: these tags will be added to all the imported bookmarks, so that you can easily distinguish them.
+						</div>
 						<button v-on:click="importBookmarks">Import</button>
 						<hr />
 						<h3>Export your bookmarks</h3>
