@@ -211,10 +211,19 @@ const App = Vue.createApp({
 		},
 		search() {
 			const url = new URL(window.location);
-			url.searchParams.set("q", this.query);
+			if (this.query) url.searchParams.set("q", this.query);
+			else url.searchParams.delete("q");
+
 			history.pushState({}, "", url);
 			this.bookmarks = [];
 			this.getBookmarks();
+		},
+		clearSearch() {
+			// This method is used only when clearing the search box
+			// as search event is not available in all browsers
+			if (!this.query) {
+				this.search();
+			}
 		},
 		deleteBookmark() {
 			if (confirm("Are you sure, you want to delete this bookmark? There is no undo.")) {

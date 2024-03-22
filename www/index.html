@@ -169,7 +169,13 @@
 						<div class="flex space-between" id="searchHeader">
 							<h1 class="page-title flex-1">My bookmarks</h1>
 							<form action="." v-on:submit="searchSubmitHandler">
-								<input type="search" v-model="query" placeholder="Search..." v-on:search="search" />
+								<input
+									type="search"
+									v-model="query"
+									placeholder="Search..."
+									v-on:keydown.enter="search"
+									v-on:search="clearSearch"
+								/>
 							</form>
 						</div>
 						<h3 v-if="queryTags">Tagged: <span v-html="displayTags(queryTags.split(','))"></span></h3>
