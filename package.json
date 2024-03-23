@@ -1,10 +1,10 @@
 {
 	"name": "webtag",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"description": "A free & open-source online bookmarking tool.",
 	"main": "init.js",
 	"scripts": {
-		"start": "node ./scripts/set-sw-version.js && node init.js",
+		"start": "node ./scripts/pre-start.js && node init.js",
 		"api-dev": "DISABLE_CSRF=true node init.js",
 		"postinstall": "node ./scripts/postinstall.js",
 		"gen:vapid": "node ./scripts/generate-vapid-keys.js",
