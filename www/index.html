@@ -178,13 +178,29 @@
 								/>
 							</form>
 						</div>
-						<h3 v-if="queryTags">Tagged: <span v-html="displayTags(queryTags.split(','))"></span></h3>
+						<div class="flex">
+							<div class="flex-1">
+								<h3 v-if="queryTags">Tagged: <span v-html="displayTags(queryTags.split(','))"></span></h3>
+							</div>
+							<div v-if="sortOptions">
+								<label for="sortBy" class="small">Sort by:</label>&nbsp;
+								<select id="sortBy" v-model="sort" v-on:change="setSort">
+									<option
+										v-for="(sortOption, i) in sortOptions"
+										v-bind:key="sortOption.value"
+										v-bind:value="sortOption.value"
+									>
+										{{sortOption.label}}
+									</option>
+								</select>
+							</div>
+						</div>
 						<div v-for="(bookmark, i) in bookmarks" v-bind:key="bookmark._id" class="bookmark">
 							<div class="link">
 								<a v-bind:href="bookmark.url" target="_blank" rel="noopener noreferrer">{{bookmark.title}}</a>
 							</div>
 							<div class="meta light">
-								<span>{{displayDate(bookmark.updatedOn)}}</span>
+								<span>{{displayDate(bookmark.createdOn)}}</span>
 								<span> &middot; </span>
 								<span v-if="bookmark.tags.length > 0" v-html="displayTags(bookmark.tags)"></span>
 								<span v-if="bookmark.tags.length > 0"> &middot; </span>
