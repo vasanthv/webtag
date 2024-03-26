@@ -28,6 +28,14 @@ const initApp = async () => {
 
 const defaultState = function () {
 	const searchParams = new URLSearchParams(window.location.search);
+	const sortOptions = [
+		{ label: "Updated on (asc)", value: "updatedOn" },
+		{ label: "Updated on (desc)", value: "-updatedOn" },
+		{ label: "Created on (asc)", value: "createdOn" },
+		{ label: "Created on (desc)", value: "-createdOn" },
+		{ label: "Title (asc)", value: "title" },
+		{ label: "Title (desc)", value: "-title" },
+	];
 	return {
 		online: navigator.onLine,
 		visible: document.visibilityState === "visible",
@@ -43,6 +51,8 @@ const defaultState = function () {
 		tags: {},
 		query: searchParams.get("q"),
 		queryTags: searchParams.get("tags"),
+		sortOptions,
+		sort: window.localStorage.sort ?? "-updatedOn",
 		newBookmark: { url: searchParams.get("url"), tags: window.localStorage.tags },
 		updateBookmark: { id: "", url: "", title: "", tags: "" },
 		showLoadMore: false,
@@ -160,7 +170,7 @@ const App = Vue.createApp({
 		},
 		getBookmarks() {
 			this.loading = true;
-			const params = { q: this.query, tags: this.queryTags };
+			const params = { q: this.query, tags: this.queryTags, sort: this.sort };
 			if (this.bookmarks.length > 0) {
 				params["skip"] = this.bookmarks.length;
 			}
@@ -224,6 +234,11 @@ const App = Vue.createApp({
 			if (!this.query) {
 				this.search();
 			}
+		},
+		setSort(e) {
+			window.localStorage.sort = e.target.value;
+			this.bookmarks = [];
+			this.getBookmarks();
 		},
 		deleteBookmark() {
 			if (confirm("Are you sure, you want to delete this bookmark? There is no undo.")) {

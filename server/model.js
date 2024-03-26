@@ -229,7 +229,6 @@ const addBookmark = async (req, res, next) => {
 		const atMentionedTags = tags.filter((t) => t.startsWith("@")).map((t) => t.substr(1));
 		let mentionedUsers = [];
 
-		console.log({ atMentionedTags });
 		if (atMentionedTags.length > 0) {
 			mentionedUsers = await Users.find({ username: { $in: atMentionedTags } })
 				.select("username devices")
@@ -238,7 +237,6 @@ const addBookmark = async (req, res, next) => {
 			// allow only valid users to be tagged
 			tags = tags.filter((tag) => (tag.startsWith("@") ? validMentionedTags.includes(tag) : true));
 		}
-		console.log({ mentionedUsers });
 
 		const newBookmark = await new Bookmarks({
 			url,
@@ -322,6 +320,7 @@ const getBookmarks = async (req, res, next) => {
 		const q = req.query.q;
 		const tags = helper.getValidTags(req.query.tags ?? "");
 		const skip = Number(req.query.skip) || 0;
+		let sort = req.query.sort ?? "-updatedOn";
 
 		let query = { $or: [{ createdBy: req.user._id }, { tags: `@${req.user.username}` }] };
 
@@ -329,12 +328,18 @@ const getBookmarks = async (req, res, next) => {
 
 		if (tags.length > 0) query = { ...query, tags: { $in: tags } };
 
+		if (!["updatedOn", "-updatedOn", "createdOn", "-createdOn", "title", "-title"].includes(sort)) {
+			sort = "-updatedOn";
+		}
+
+		console.log({ sort });
 		const bookmarks = await Bookmarks.find(query)
-			.select("url title createdBy updatedOn tags")
+			.select("url title createdBy updatedOn createdOn tags")
 			.skip(skip)
 			.populate([{ path: "createdBy", select: "username" }])
 			.limit(config.PAGE_LIMIT)
-			.sort("-updatedOn")
+			.sort(sort)
+			.collation({ locale: "en" })
 			.exec();
 
 		res.json({ bookmarks });
