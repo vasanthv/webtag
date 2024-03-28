@@ -29,10 +29,10 @@ const initApp = async () => {
 const defaultState = function () {
 	const searchParams = new URLSearchParams(window.location.search);
 	const sortOptions = [
-		{ label: "Updated on (asc)", value: "updatedOn" },
-		{ label: "Updated on (desc)", value: "-updatedOn" },
-		{ label: "Created on (asc)", value: "createdOn" },
-		{ label: "Created on (desc)", value: "-createdOn" },
+		{ label: "Last updated date (asc)", value: "updatedOn" },
+		{ label: "Last updated date (desc)", value: "-updatedOn" },
+		{ label: "Created date (asc)", value: "createdOn" },
+		{ label: "Created date (desc)", value: "-createdOn" },
 		{ label: "Title (asc)", value: "title" },
 		{ label: "Title (desc)", value: "-title" },
 	];
