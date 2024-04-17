@@ -200,6 +200,8 @@
 								<a v-bind:href="bookmark.url" target="_blank" rel="noopener noreferrer">{{bookmark.title}}</a>
 							</div>
 							<div class="meta light">
+								<span v-if="bookmark.createdBy.username !== username">Shared by @{{bookmark.createdBy.username}}</span>
+								<span v-if="bookmark.createdBy.username !== username"> &middot; </span>
 								<span>{{displayDate(bookmark.createdOn)}}</span>
 								<span> &middot; </span>
 								<span v-if="bookmark.tags.length > 0" v-html="displayTags(bookmark.tags)"></span>
