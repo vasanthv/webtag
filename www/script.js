@@ -53,7 +53,7 @@ const defaultState = function () {
 		queryTags: searchParams.get("tags"),
 		sortOptions,
 		sort: window.localStorage.sort ?? "-updatedOn",
-		newBookmark: { url: searchParams.get("url"), tags: window.localStorage.tags },
+		newBookmark: { url: searchParams.get("url"), title: searchParams.get("title"), tags: window.localStorage.tags },
 		updateBookmark: { id: "", url: "", title: "", tags: "" },
 		showLoadMore: false,
 		importFile: { file: null, tags: "" },

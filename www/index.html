@@ -239,6 +239,15 @@
 						<label for="url">Enter URL</label>
 						<input type="text" id="url" placeholder="Enter a URL" v-model="newBookmark.url" />
 
+						<label for="title" v-if="newBookmark.title">Enter title</label>
+						<input
+							type="text"
+							id="title"
+							placeholder="Enter a title"
+							v-model="newBookmark.title"
+							v-if="newBookmark.title"
+						/>
+
 						<label for="tags">Enter tags</label>
 						<input type="text" id="tags" placeholder="Enter tags" v-model="newBookmark.tags" class="hasHelperText" />
 						<div class="small light helperText">Note: Only alphanumeric; Comma or space separated</div>
