@@ -367,7 +367,7 @@ const getBookmark = async (req, res, next) => {
 const getTags = async (req, res, next) => {
 	try {
 		const bookmarkTags = await Bookmarks.find({
-			createdBy: req.user._id,
+			$or: [{ createdBy: req.user._id }, { tags: `@${req.user.username}` }],
 			tags: { $exists: true, $not: { $size: 0 } },
 		}).select("tags");
 
