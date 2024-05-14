@@ -119,7 +119,7 @@ const App = Vue.createApp({
 			this.userEvent("login");
 		},
 		forgotPassword() {
-			if (!this.authCreds.username || !this.authCreds.password) {
+			if (!this.authCreds.username) {
 				return this.setToast("Please enter your username");
 			}
 			axios.post("/api/reset", { username: this.authCreds.username }).then((response) => {

@@ -81,16 +81,16 @@ const verifyEmail = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
 	try {
-		const email = req.body.email;
+		const username = helper.getValidUsername(req.body.username);
 
-		const channel = await Users.findOne({ email }).exec();
-		if (!channel) return helper.httpError(400, "Invalid Email");
+		const user = await Users.findOne({ username }).exec();
+		if (!user) return helper.httpError(400, "Invalid username");
 
 		const passwordString = randomString.generate(8);
 		const password = await helper.getValidPassword(passwordString);
 
-		await Users.updateOne({ _id: channel._id }, { password, lastUpdatedOn: new Date() });
-		await sendEmail.resetPasswordEmail(channel.username, channel.email, passwordString);
+		await Users.updateOne({ _id: user._id }, { password, lastUpdatedOn: new Date() });
+		await sendEmail.resetPasswordEmail(user.username, user.email, passwordString);
 
 		res.json({ message: "Password resetted" });
 	} catch (error) {
