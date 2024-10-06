@@ -326,7 +326,7 @@ const getBookmarks = async (req, res, next) => {
 
 		if (q) query = { $and: [{ $or: query["$or"] }, { $text: { $search: q } }] };
 
-		if (tags.length > 0) query = { ...query, $and: tags.map(tag => ({tags: tag}) };
+		if (tags.length > 0) query = { ...query, $and: tags.map((tag) => ({ tags: tag })) };
 
 		if (!["updatedOn", "-updatedOn", "createdOn", "-createdOn", "title", "-title"].includes(sort)) {
 			sort = "-updatedOn";
