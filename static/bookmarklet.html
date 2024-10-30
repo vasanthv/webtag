@@ -57,7 +57,7 @@
 						major browsers. In desktop browsers, just drag and drop the below button to your bookmarks
 						bar.<br />
 						<a
-							href="javascript:(window.open(`https://webtag.io/bookmark?url=${encodeURIComponent(location.href)}&title=${encodeURIComponent(document.title)}`, '_blank', 'left=100,top=100,width=680,height=440'))()"
+							href="javascript:(window.open(%60https://webtag.io/bookmark?url=$%7BencodeURIComponent(location.href)%7D&title=$%7BencodeURIComponent(document.title)%7D%60, %27_blank%27, %27left=100,top=100,width=680,height=440%27))()"
 							id="dragBookmarklet"
 							class="button"
 							>Add to Webtag</a
@@ -71,8 +71,8 @@
 
 					<p>
 						<code id="bookmarkletCode"
-							>javascript:(window.open(`https://webtag.io/bookmark?url=${encodeURIComponent(location.href)}&title=${encodeURIComponent(document.title)}`,
-							'_blank', 'left=100,top=100,width=680,height=440'))()</code
+							>javascript:(window.open(%60https://webtag.io/bookmark?url=$%7BencodeURIComponent(location.href)%7D&title=$%7BencodeURIComponent(document.title)%7D%60,
+							%27_blank%27, %27left=100,top=100,width=680,height=440%27))()</code
 						>
 						<button onclick="copyBookmarkletCode()">Copy bookmarklet code</button>
 					</p>
