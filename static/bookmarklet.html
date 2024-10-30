@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -26,6 +26,22 @@
 		<title>Bookmarklet - Webtag</title>
 		<!-- Site scripts & styles -->
 		<link href="/style.css" rel="stylesheet" />
+
+		<script type="text/javascript">
+			function copyBookmarkletCode() {
+				let text = document.getElementById("bookmarkletCode").innerHTML;
+
+				const copyContent = async () => {
+					try {
+						await navigator.clipboard.writeText(text);
+						alert("Code copied to clipboard");
+					} catch (err) {
+						console.error("Failed to copy: ", err);
+					}
+				};
+				copyContent();
+			}
+		</script>
 	</head>
 	<body>
 		<div id="app">
@@ -37,8 +53,9 @@
 					<h1 class="page-title">Bookmarklet</h1>
 
 					<p>
-						This bookmarklet lets you add bookmarks to Webtag in just a couple of clicks and it works in all major
-						browsers. In desktop browsers, just drag and drop the below button to your bookmarks bar.<br />
+						This bookmarklet lets you add bookmarks to Webtag in just a couple of clicks and it works in all
+						major browsers. In desktop browsers, just drag and drop the below button to your bookmarks
+						bar.<br />
 						<a
 							href="javascript:(window.open(`https://webtag.io/bookmark?url=${encodeURIComponent(location.href)}&title=${encodeURIComponent(document.title)}`, '_blank', 'left=100,top=100,width=680,height=440'))()"
 							id="dragBookmarklet"
@@ -48,7 +65,8 @@
 					</p>
 
 					<p>
-						In mobile browsers, bookmark this page first and then edit the bookmark to add the below code as its URL
+						In mobile browsers, bookmark this page first and then edit the bookmark to add the below code as
+						its URL
 					</p>
 
 					<p>
