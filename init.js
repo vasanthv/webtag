@@ -10,6 +10,8 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 const config = require("./server/config");
 const apiRoutes = require("./server/routes");
 
+app.set("trust proxy", true);
+
 // Set the view engine
 app.set("view engine", "ejs");
 
