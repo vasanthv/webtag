@@ -20,9 +20,9 @@ app.use(express.static(path.join(__dirname, "www"), { maxAge: 0 }));
 
 app.use(middlewares);
 
-app.use("/", viewRoutes);
-
 app.use("/api", apiRoutes);
+
+app.use("/", viewRoutes);
 
 // Start the server
 app.listen(config.PORT, null, function () {

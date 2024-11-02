@@ -30,7 +30,7 @@ router.use((req, res, next) => {
 	csrfs = csrfs.filter((csrf) => csrf.expiry > currentTimeInSeconds);
 
 	req.session.csrfs = csrfs;
-	res.csrfToken = csrfToken;
+	req.csrfToken = csrfToken;
 	next();
 });
 

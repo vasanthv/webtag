@@ -2,38 +2,49 @@
  * Webtag Service worker
  */
 
-const currentCacheName = "webtag-v-~VERSION";
+const CACHE_NAME = "webtag-v-~VERSION";
+const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", function (e) {
 	console.log("Install event triggered. New updates available.");
-	const filesToCache = ["/", "/manifest.json", "/style.css", "/vue.global.prod.js", "/axios.min.js", "/script.js"];
+	const filesToCache = ["/manifest.json", "/style.css", "/vue.global.prod.js", "/axios.min.js", "/script.js"];
 
 	// Deleting the previous version of cache
 	e.waitUntil(
 		caches.keys().then(function (cacheNames) {
 			return Promise.all(
-				cacheNames.filter((cacheName) => cacheName != currentCacheName).map((cacheName) => caches.delete(cacheName))
+				cacheNames.filter((cacheName) => cacheName != CACHE_NAME).map((cacheName) => caches.delete(cacheName))
 			);
 		})
 	);
 
 	// add the files to cache
 	e.waitUntil(
-		caches.open(currentCacheName).then(function (cache) {
+		caches.open(CACHE_NAME).then(function (cache) {
 			return cache.addAll(filesToCache);
 		})
 	);
 });
 
+const cacheFirst = async (event) => {
+	try {
+		const responseFromCache = await caches.match(event.request);
+		if (responseFromCache) return responseFromCache;
+
+		const liveResponse = await fetch(event.request);
+		return liveResponse;
+	} catch (err) {
+		console.log(err);
+		if (event.request.mode === "navigate") {
+			const cache = await caches.open(CACHE_NAME);
+			const cachedResponse = await cache.match(OFFLINE_URL);
+			return cachedResponse;
+		}
+	}
+};
+
 self.addEventListener("fetch", function (event) {
-	event.respondWith(
-		caches
-			.match(event.request)
-			.then(function (cache) {
-				return cache || fetch(event.request);
-			})
-			.catch((err) => {})
-	);
+	event.respondWith(cacheFirst(event));
 });
 
 self.addEventListener("push", function (event) {
