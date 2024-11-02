@@ -370,6 +370,8 @@ const App = Vue.createApp({
 			return true;
 		},
 		initApp() {
+			if (this.isloggedIn) this.getMe();
+
 			switch (this.page) {
 				case "bookmarks":
 					{
@@ -381,9 +383,6 @@ const App = Vue.createApp({
 					break;
 				case "tags":
 					this.getTags();
-					break;
-				case "account":
-					this.getMe();
 					break;
 				case "edit":
 					{
