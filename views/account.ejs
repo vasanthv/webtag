@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+	<%- include('html-head'); -%>
+	<body>
+		<div id="app">
+			<div class="wrap">
+				<%- include('toast'); -%>
+				<section>
+					<h1 class="page-title">Your account</h1>
+					<label for="username">Your username</label>
+					<input type="text" id="username" v-model="myAccount.username" v-bind:disabled="true" />
+					<label for="email">Your e-mail address</label>
+					<input type="email" id="email" placeholder="Email address" v-model="myAccount.email" />
+					<label for="password">Password</label>
+					<input type="password" id="password" placeholder="Enter new password" v-model="myAccount.password" />
+					<label for="defaultTags">Default tags</label>
+					<input
+						type="text"
+						id="defaultTags"
+						placeholder="Enter some tags"
+						v-model="myAccount.defaultTags"
+						class="hasHelperText"
+					/>
+					<div class="small light helperText">Will be auto-added when bookmarking</div>
+					<button class="bold" v-on:click="updateAccount">Update account</button>
+					<br /><br />
+					<button class="red" v-on:click="logOut()">Log out</button>
+					<hr />
+					<h3>Import bookmarks</h3>
+					<p>
+						You can import bookmarks from
+						<a href="https://hvcc.teamdynamix.com/TDClient/1967/Portal/KB/ArticleDet?ID=144671" target="_blank">
+							any browser</a
+						>.
+					</p>
+					<div><input type="file" name="bookmarks" id="importFile" v-on:change="setImportFile" /></div>
+					<label for="tags">Enter import tags</label>
+					<input type="text" id="tags" placeholder="Enter tags" v-model="importFile.tags" class="hasHelperText" />
+					<div class="small light helperText">
+						Note: these tags will be added to all the imported bookmarks, so that you can easily distinguish them.
+					</div>
+					<button v-on:click="importBookmarks">Import</button>
+					<hr />
+					<h3>Export your bookmarks</h3>
+					<p>
+						You can export all your bookmarks any time here. You'll get a bookmarks file that can be imported to any
+						browser.
+					</p>
+					<button v-on:click="exportBookmarks">Download your bookmarks</button>
+					<hr />
+					<h3>Experimental features</h3>
+					<div class="bold">Enable push notifications</div>
+					You will receive a push notification when someone tags you on their bookmark. Works only on
+					<a href="https://caniuse.com/push-api" target="_blank">supported browsers</a>.<br />
+					<label class="switch">
+						<input type="checkbox" v-on:click="togglePush" v-bind:checked="pushSubscribed" />
+						<span class="slider"></span>
+					</label>
+				</section>
+			</div>
+		</div>
+		<%- include('footer'); -%>
+	</body>
+</html>

@@ -1,4 +1,4 @@
-/* global linkifyHtml, page, axios, Vue, cabin */
+/* global page, axios, Vue, cabin */
 
 let swReg = null;
 const urlB64ToUint8Array = (base64String) => {
@@ -11,7 +11,17 @@ const urlB64ToUint8Array = (base64String) => {
 	}
 	return outputArray;
 };
+function getMeta(metaName) {
+	const metas = document.getElementsByTagName("meta");
+	for (let i = 0; i < metas.length; i++) {
+		if (metas[i].getAttribute("name") === metaName) {
+			return metas[i].getAttribute("content");
+		}
+	}
+	return null;
+}
 
+console.log(getMeta("video"));
 const initApp = async () => {
 	if ("serviceWorker" in navigator) {
 		swReg = await navigator.serviceWorker.register("/sw.js");
@@ -36,17 +46,19 @@ const defaultState = function () {
 		{ label: "Title (asc)", value: "title" },
 		{ label: "Title (desc)", value: "-title" },
 	];
+	const page = getMeta("webtag-page");
+	const username = getMeta("webtag-username");
 	return {
 		online: navigator.onLine,
 		visible: document.visibilityState === "visible",
 		loading: true,
-		page: "",
+		page,
 		newAccount: { username: "", email: "", password: "" },
 		authCreds: { username: "", password: "" },
 		toast: [{ type: "", message: "" }],
 		me: { username: "", email: "", password: "", defaultTags: "", publicTags: "" },
 		myAccount: {},
-		username: window.localStorage.username,
+		username,
 		bookmarks: [],
 		tags: {},
 		query: searchParams.get("q"),
@@ -381,76 +393,77 @@ window.onerror = App.logError;
 		}
 	);
 	initApp();
+	if (App.page === "bookmarks") App.getBookmarks();
 })();
 
-page("*", (ctx, next) => {
-	// resetting state on any page load
-	App.resetState();
-	if (window.cancelRequestController) {
-		window.cancelRequestController.abort();
-	}
-	if (App.isloggedIn) App.getMe();
-	next();
-});
+// page("*", (ctx, next) => {
+// 	// resetting state on any page load
+// 	App.resetState();
+// 	if (window.cancelRequestController) {
+// 		window.cancelRequestController.abort();
+// 	}
+// 	if (App.isloggedIn) App.getMe();
+// 	next();
+// });
 
-/* Routes declaration */
-page("/", (ctx) => {
-	document.title = "Webtag - A free text-based bookmarking.";
-	App.page = App.isloggedIn ? "home" : "intro";
+// /* Routes declaration */
+// page("/", (ctx) => {
+// 	document.title = "Webtag - A free text-based bookmarking.";
+// 	App.page = App.isloggedIn ? "home" : "intro";
 
-	if (App.isloggedIn) {
-		const urlParams = new URLSearchParams(ctx.querystring);
-		App.query = urlParams.get("q");
-		App.queryTags = urlParams.get("tags");
-		App.getBookmarks();
-	}
-});
+// 	if (App.isloggedIn) {
+// 		const urlParams = new URLSearchParams(ctx.querystring);
+// 		App.query = urlParams.get("q");
+// 		App.queryTags = urlParams.get("tags");
+// 		App.getBookmarks();
+// 	}
+// });
 
-page("/signup", () => {
-	document.title = "Sign up: Webtag";
-	if (App.isloggedIn) return page.redirect("/");
-	else App.page = "signup";
-});
+// page("/signup", () => {
+// 	document.title = "Sign up: Webtag";
+// 	if (App.isloggedIn) return page.redirect("/");
+// 	else App.page = "signup";
+// });
 
-page("/login", () => {
-	document.title = "Log in: Webtag";
-	if (App.isloggedIn) return page.redirect("/");
-	else App.page = "login";
-});
+// page("/login", () => {
+// 	document.title = "Log in: Webtag";
+// 	if (App.isloggedIn) return page.redirect("/");
+// 	else App.page = "login";
+// });
 
-page("/tags", () => {
-	document.title = "My tags: Webtag";
-	if (!App.isloggedIn) return page.redirect("/login");
-	App.page = "tags";
-	App.getTags();
-});
+// page("/tags", () => {
+// 	document.title = "My tags: Webtag";
+// 	if (!App.isloggedIn) return page.redirect("/login");
+// 	App.page = "tags";
+// 	App.getTags();
+// });
 
-page("/bookmark", () => {
-	document.title = "New bookmark: Webtag";
-	if (!App.isloggedIn) return page.redirect("/login");
-	App.page = "newBookmark";
-});
+// page("/bookmark", () => {
+// 	document.title = "New bookmark: Webtag";
+// 	if (!App.isloggedIn) return page.redirect("/login");
+// 	App.page = "newBookmark";
+// });
 
-page("/edit", (ctx) => {
-	document.title = "Edit bookmark: Webtag";
-	if (!App.isloggedIn) return page.redirect("/login");
-	const urlParams = new URLSearchParams(ctx.querystring);
-	if (!urlParams.get("id")) return page.redirect("/");
-	App.updateBookmark.id = urlParams.get("id");
-	App.page = "editBookmark";
-	App.getBookmark(App.updateBookmark.id);
-});
+// page("/edit", (ctx) => {
+// 	document.title = "Edit bookmark: Webtag";
+// 	if (!App.isloggedIn) return page.redirect("/login");
+// 	const urlParams = new URLSearchParams(ctx.querystring);
+// 	if (!urlParams.get("id")) return page.redirect("/");
+// 	App.updateBookmark.id = urlParams.get("id");
+// 	App.page = "editBookmark";
+// 	App.getBookmark(App.updateBookmark.id);
+// });
 
-page("/account", () => {
-	document.title = "My acount: Webtag";
-	if (!App.isloggedIn) return page.redirect("/login");
-	App.page = "account";
-	App.getMe();
-});
+// page("/account", () => {
+// 	document.title = "My acount: Webtag";
+// 	if (!App.isloggedIn) return page.redirect("/login");
+// 	App.page = "account";
+// 	App.getMe();
+// });
 
-page("/*", () => {
-	document.title = "Page not found: Webtag";
-	App.page = "404";
-});
+// page("/*", () => {
+// 	document.title = "Page not found: Webtag";
+// 	App.page = "404";
+// });
 
-page();
+// page();

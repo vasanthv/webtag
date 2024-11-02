@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+	<%- include('html-head'); -%>
+	<body>
+		<div id="app">
+			<div class="wrap">
+				<%- include('toast'); -%>
+				<section>
+					<h1 class="page-title">New bookmark</h1>
+					<label for="url">Enter URL</label>
+					<input type="text" id="url" placeholder="Enter a URL" v-model="newBookmark.url" />
+
+					<label for="title" v-if="newBookmark.title">Enter title</label>
+					<input
+						type="text"
+						id="title"
+						placeholder="Enter a title"
+						v-model="newBookmark.title"
+						v-if="newBookmark.title"
+					/>
+
+					<label for="tags">Enter tags</label>
+					<input type="text" id="tags" placeholder="Enter tags" v-model="newBookmark.tags" class="hasHelperText" />
+					<div class="small light helperText">Note: Only alphanumeric; Comma or space separated</div>
+
+					<button class="bold" v-on:click="addBookmark">Add bookmark</button>
+					<br /><br />
+					<div>
+						<a href="https://www.buymeacoffee.com/vasanthv" target="_blank"
+							><img
+								src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+								alt="Buy Me A Coffee"
+								style="height: 60px !important"
+						/></a>
+					</div>
+				</section>
+			</div>
+		</div>
+		<%- include('footer'); -%>
+	</body>
+</html>

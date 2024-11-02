@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+	<%- include('html-head'); -%>
+	<body>
+		<div id="app">
+			<div class="wrap">
+				<%- include('toast'); -%>
+				<section>
+					<h1 class="page-title">Create an account</h1>
+					<label for="username">Username</label>
+					<input type="text" id="username" placeholder="Username" v-model="newAccount.username" />
+					<label for="email">E-mail address</label>
+					<input type="email" id="email" placeholder="Email address" v-model="newAccount.email" />
+					<label for="password">Password</label>
+					<input
+						type="password"
+						id="password"
+						placeholder="Password"
+						v-model="newAccount.password"
+						v-on:keydown.enter="signUp"
+					/>
+					<button class="bold" v-on:click="signUp">Sign up</button>
+					<div class="small light">Already got an account? <a href="/login">Log in</a></div>
+				</section>
+			</div>
+		</div>
+		<%- include('footer'); -%>
+	</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+	<%- include('html-head'); -%>
+	<body>
+		<div id="app">
+			<div class="wrap">
+				<%- include('toast'); -%>
+				<section>
+					<nav>
+						<a href="/">Home</a>
+					</nav>
+					<h1 class="page-title">Bookmarklet</h1>
+
+					<p>
+						This bookmarklet lets you add bookmarks to Webtag in just a couple of clicks and it works in all major
+						browsers. In desktop browsers, just drag and drop the below button to your bookmarks bar.<br />
+						<a
+							href="javascript:(window.open(`https://webtag.io/bookmark?url=${encodeURIComponent(location.href)}&mp;title=${encodeURIComponent(document.title)}`, '_blank', 'left=100,top=100,width=680,height=440'))()"
+							id="dragBookmarklet"
+							class="button"
+							>Add to Webtag</a
+						>
+					</p>
+
+					<p>
+						In mobile browsers, bookmark this page first and then edit the bookmark to add the below code as its URL
+					</p>
+
+					<p>
+						<code id="bookmarkletCode"
+							>javascript:(window.open(`https://webtag.io/bookmark?url=${encodeURIComponent(location.href)}&mp;title=${encodeURIComponent(document.title)}`,
+							'_blank', 'left=100,top=100,width=680,height=440'))()</code
+						>
+						<button onclick="copyBookmarkletCode()">Copy bookmarklet code</button>
+					</p>
+				</section>
+			</div>
+		</div>
+		<%- include('footer'); -%>
+		<script type="text/javascript">
+			function copyBookmarkletCode() {
+				let text = document.getElementById("bookmarkletCode").innerHTML;
+
+				const copyContent = async () => {
+					try {
+						await navigator.clipboard.writeText(text);
+						alert("Code copied to clipboard");
+					} catch (err) {
+						console.error("Failed to copy: ", err);
+					}
+				};
+				copyContent();
+			}
+		</script>
+	</body>
+</html>

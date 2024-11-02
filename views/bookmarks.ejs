@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+	<%- include('html-head'); -%>
+	<body>
+		<div id="app">
+			<div class="wrap">
+				<%- include('toast'); -%>
+				<section>
+					<div class="flex space-between" id="searchHeader">
+						<h1 class="page-title flex-1">My bookmarks</h1>
+						<form action="." v-on:submit="searchSubmitHandler">
+							<input
+								type="search"
+								v-model="query"
+								placeholder="Search..."
+								v-on:keydown.enter="search"
+								v-on:search="clearSearch"
+							/>
+						</form>
+					</div>
+					<div class="flex">
+						<div class="flex-1">
+							<h3 v-if="queryTags">Tagged: <span v-html="displayTags(queryTags.split(','))"></span></h3>
+						</div>
+						<div v-if="sortOptions">
+							<label for="sortBy" class="small">Sort by:</label>&nbsp;
+							<select id="sortBy" v-model="sort" v-on:change="setSort">
+								<option
+									v-for="(sortOption, i) in sortOptions"
+									v-bind:key="sortOption.value"
+									v-bind:value="sortOption.value"
+								>
+									{{sortOption.label}}
+								</option>
+							</select>
+						</div>
+					</div>
+					<div v-for="(bookmark, i) in bookmarks" v-bind:key="bookmark._id" class="bookmark">
+						<div class="link">
+							<a v-bind:href="bookmark.url" target="_blank" rel="noopener noreferrer">{{bookmark.title}}</a>
+						</div>
+						<div class="meta light">
+							<span v-if="bookmark.createdBy.username !== username">Shared by @{{bookmark.createdBy.username}}</span>
+							<span v-if="bookmark.createdBy.username !== username"> &middot; </span>
+							<span>{{displayDate(bookmark.createdOn)}}</span>
+							<span> &middot; </span>
+							<span v-if="bookmark.tags.length > 0" v-html="displayTags(bookmark.tags)"></span>
+							<span v-if="bookmark.tags.length > 0"> &middot; </span>
+							<a v-bind:href="'/edit?id='+bookmark._id" v-if="bookmark.createdBy.username === username">edit</a>
+							<a
+								href="javascript:void(0)"
+								v-if="bookmark.createdBy.username !== username"
+								v-on:click="removeMeFromTag(bookmark._id)"
+							>
+								remove
+							</a>
+						</div>
+					</div>
+					<p v-if="bookmarks.length === 0 && !loading" class="light">No bookmarks to show</p>
+					<div v-if="loading" class="loader"></div>
+
+					<button class="link bold" v-on:click="getBookmarks" v-if="showLoadMore">Load more &darr;</button>
+				</section>
+			</div>
+		</div>
+		<%- include('footer'); -%>
+	</body>
+</html>

@@ -1,31 +1,16 @@
-const mongoStore = require("connect-mongo");
-const session = require("express-session");
 const router = require("express").Router();
 const bodyParser = require("body-parser");
 const multer = require("multer");
-const morgan = require("morgan");
-const uuid = require("uuid").v4;
 
-const config = require("./config");
-const model = require("./model");
-const helper = require("./helper");
+const config = require("../config");
+const model = require("../model");
+const helper = require("../helper");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Username API requests
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
-router.use(morgan("dev")); // for dev logging
-
-router.use(
-	session({
-		secret: config.SECRET,
-		store: mongoStore.create({ mongoUrl: config.MONGODB_URI }),
-		cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },
-		resave: true,
-		saveUninitialized: true,
-	})
-);
 
 router.get("/verify/:code", model.verifyEmail);
 router.get("/meta", (req, res) => res.json({ vapidKey: config.PUSH_OPTIONS.vapidDetails.publicKey }));
@@ -34,27 +19,12 @@ router.post("/error", (req, res) => {
 	res.send();
 });
 
-// Basic CSRF implementation
-// TODO: Replace with other better npm packages if available
-router.get("/csrf.js", async (req, res) => {
-	let csrfs = [...(req.session.csrfs ? req.session.csrfs : [])];
-	const currentTimeInSeconds = new Date().getTime() / 1000;
-
-	const csrfToken = uuid();
-	csrfs.push({ token: csrfToken, expiry: currentTimeInSeconds + config.CSRF_TOKEN_EXPIRY });
-	csrfs = csrfs.filter((csrf) => csrf.expiry > currentTimeInSeconds);
-
-	req.session.csrfs = csrfs;
-	res.send(`window.CSRF_TOKEN="${csrfToken}"`);
-});
-
 router.use(helper.csrfValidator);
 
 router.post("/signup", helper.rateLimit({ windowMs: 30, max: 2, skipFailedRequests: true }), model.signUp);
 router.post("/login", helper.rateLimit({ max: 5 }), model.logIn);
 router.post("/reset", helper.rateLimit({ max: 5 }), model.resetPassword);
 
-router.use(helper.attachUsertoRequest);
 router.use(["/bookmarks/:id", "/bookmarks"], helper.attachUsertoRequestFromAPIKey);
 router.use(helper.isUserAuthed);
 

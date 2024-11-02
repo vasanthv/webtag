@@ -1,0 +1,13 @@
+<header>
+	<nav>
+		<a href="/">Home</a>
+		<span class="separator">&middot;</span>
+		<a href="/signup" v-if="!isloggedIn">Sign up</a>
+		<a href="/tags" v-if="isloggedIn">Tags</a>
+		<span class="separator">&middot;</span>
+		<a href="/login" v-if="!isloggedIn">Log in</a>
+		<a href="/account" v-if="isloggedIn">Account</a>
+		<span class="separator" v-if="isloggedIn">&middot;</span>
+		<a href="/bookmark" v-if="isloggedIn">Add bookmark</a>
+	</nav>
+</header>
