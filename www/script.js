@@ -1,4 +1,4 @@
-/* global page, axios, Vue, cabin */
+/* global axios, Vue, cabin */
 
 let swReg = null;
 const urlB64ToUint8Array = (base64String) => {
@@ -19,6 +19,11 @@ function getMeta(metaName) {
 		}
 	}
 	return null;
+}
+
+function redirect(path, replace = false) {
+	if (replace) window.location.replace(path);
+	else window.location.href = path;
 }
 
 const initServiceWorker = async () => {
@@ -140,7 +145,7 @@ const App = Vue.createApp({
 			window.localStorage.username = this.username = response.data.username;
 			this.newAccount = { username: "", email: "", password: "" };
 			this.authCreds = { username: "", password: "" };
-			page.redirect("/");
+			redirect("/", true);
 			this.setToast(response.data.message, "success");
 		},
 		getMe(queryParams = "") {
@@ -211,7 +216,10 @@ const App = Vue.createApp({
 			axios.post("/api/bookmarks", { ...this.newBookmark }).then((response) => {
 				this.setToast(response.data.message, "success");
 				this.newBookmark = { tags: this.me.defaultTags.join(", "), url: "" };
-				page.redirect("/");
+				// this will close the window only if it opened by a script
+				window.close();
+
+				redirect("/");
 			});
 		},
 		saveBookmark() {
@@ -255,7 +263,7 @@ const App = Vue.createApp({
 				const { id } = this.updateBookmark;
 				axios.delete(`/api/bookmarks/${id}`).then((response) => {
 					this.setToast(response.data.message, "success");
-					page.redirect("/");
+					redirect("/");
 				});
 			}
 		},
@@ -352,7 +360,7 @@ const App = Vue.createApp({
 			const localClear = () => {
 				window.localStorage.clear();
 				this.resetState();
-				page.redirect("/");
+				redirect("/");
 			};
 			if (autoSignOut || confirm("Are you sure, you want to log out?")) axios.post("/api/logout").finally(localClear);
 		},
@@ -380,10 +388,10 @@ const App = Vue.createApp({
 				case "edit":
 					{
 						const urlParams = new URLSearchParams(window.location.search);
-						if (!urlParams.get("id")) return page.redirect("/");
-						App.updateBookmark.id = urlParams.get("id");
-						App.page = "editBookmark";
-						App.getBookmark(App.updateBookmark.id);
+						if (!urlParams.get("id")) return redirect("/");
+						this.updateBookmark.id = urlParams.get("id");
+						this.page = "editBookmark";
+						this.getBookmark(this.updateBookmark.id);
 					}
 					break;
 				default:
