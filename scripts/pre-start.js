@@ -3,7 +3,7 @@ const path = require("path");
 
 console.log("Node environment is:", process.env.NODE_ENV);
 if (process.env.NODE_ENV === "production") {
-	const serviceWorkerContents = fs.readFileSync(path.join(__dirname, "../www/sw.js")).toString();
+	const serviceWorkerContents = fs.readFileSync(path.join(__dirname, "../assets/sw.js")).toString();
 	const VERSION = JSON.parse(fs.readFileSync(path.join(__dirname, "../package.json"))).version;
 
 	const newServiceWorkerContents = serviceWorkerContents.replace("~VERSION", VERSION);
