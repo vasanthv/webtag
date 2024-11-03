@@ -65,8 +65,8 @@ router.get("/privacy", async (req, res) => {
 	res.render("privacy", getViewProps(req, "Privacy policy - Webtag"));
 });
 
-router.get("/offline", async (req, res) => {
-	res.render("offline", getViewProps(req, "You are offline - Webtag"));
+router.get("/looptap", async (req, res) => {
+	res.render("looptap", getViewProps(req, "Looptap - Webtag"));
 });
 
 router.get("/*", async (req, res) => {

@@ -3,7 +3,7 @@
  */
 
 const CACHE_NAME = "webtag-v-~VERSION";
-const OFFLINE_URL = "/offline";
+const OFFLINE_URL = "/looptap";
 
 self.addEventListener("install", function (e) {
 	console.log("Install event triggered. New updates available.");
@@ -15,7 +15,7 @@ self.addEventListener("install", function (e) {
 		"/vue.global.prod.js",
 		"/axios.min.js",
 		"/script.js",
-		"/offline",
+		"/looptap",
 	];
 
 	// Deleting the previous version of cache
