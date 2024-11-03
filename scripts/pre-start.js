@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === "production") {
 
 		const scriptTag = `<script async defer src="${process.env.ANALYTICS_SCRIPT}"></script>`;
 
-		const filesToBeTracked = ["../views/footer.ejs"];
+		const filesToBeTracked = ["../views/footer.ejs", "../views/offline.ejs"];
 
 		filesToBeTracked.forEach((file) => {
 			const fileContents = fs.readFileSync(path.join(__dirname, file)).toString();
