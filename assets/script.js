@@ -73,6 +73,7 @@ const defaultState = function () {
 		showLoadMore: false,
 		importFile: { file: null, tags: "" },
 		pushSubscribed: window.localStorage.pushSubscribed === "true",
+		urlState: searchParams.get("state"),
 	};
 };
 
@@ -145,7 +146,7 @@ const App = Vue.createApp({
 			window.localStorage.username = this.username = response.data.username;
 			this.newAccount = { username: "", email: "", password: "" };
 			this.authCreds = { username: "", password: "" };
-			redirect("/", true);
+			redirect(this.urlState ?? "/", true);
 			this.setToast(response.data.message, "success");
 		},
 		getMe(queryParams = "") {

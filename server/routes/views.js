@@ -20,27 +20,32 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/signup", async (req, res) => {
-	if (req.user) res.render("bookmarks", getViewProps(req));
+	if (req.user) res.redirect("/");
 	res.render("signup", getViewProps(req, "Create an account - Webtag"));
 });
 
 router.get("/login", async (req, res) => {
+	if (req.user) res.redirect("/");
 	res.render("login", getViewProps(req, "Log in - Webtag"));
 });
 
 router.get("/tags", async (req, res) => {
+	if (!req.user) res.redirect(`/login?state=${req.path}`);
 	res.render("tags", getViewProps(req, "Tags - Webtag"));
 });
 
 router.get("/bookmark", async (req, res) => {
+	if (!req.user) res.redirect(`/login?state=${req.path}`);
 	res.render("bookmark-new", getViewProps(req, "Add new bookmark - Webtag"));
 });
 
 router.get("/edit", async (req, res) => {
+	if (!req.user) res.redirect(`/login?state=${req.path}`);
 	res.render("bookmark-edit", getViewProps(req, "Edit bookmark - Webtag"));
 });
 
 router.get("/account", async (req, res) => {
+	if (!req.user) res.redirect(`/login?state=${req.path}`);
 	res.render("account", getViewProps(req, "Account - Webtag"));
 });
 

@@ -1,6 +1,6 @@
 {
 	"name": "webtag",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "A free & open-source online bookmarking tool.",
 	"main": "init.js",
 	"scripts": {
