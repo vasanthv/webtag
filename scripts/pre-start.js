@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === "production") {
 
 	const newServiceWorkerContents = serviceWorkerContents.replace("~VERSION", VERSION);
 
-	fs.writeFileSync(path.join(__dirname, "../www/sw.js"), newServiceWorkerContents);
+	fs.writeFileSync(path.join(__dirname, "../assets/sw.js"), newServiceWorkerContents);
 
 	console.log("Service worker file updated to version", VERSION);
 
