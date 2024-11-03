@@ -1,9 +1,9 @@
-/* global linkifyHtml, page, axios, Vue, cabin */
+/* global axios, Vue, cabin */
 
 let swReg = null;
 const urlB64ToUint8Array = (base64String) => {
 	const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-	const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
+	const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
 	const rawData = window.atob(base64);
 	const outputArray = new Uint8Array(rawData.length);
 	for (let i = 0; i < rawData.length; ++i) {
@@ -11,11 +11,24 @@ const urlB64ToUint8Array = (base64String) => {
 	}
 	return outputArray;
 };
+function getMeta(metaName) {
+	const metas = document.getElementsByTagName("meta");
+	for (let i = 0; i < metas.length; i++) {
+		if (metas[i].getAttribute("name") === metaName) {
+			return metas[i].getAttribute("content");
+		}
+	}
+	return null;
+}
 
-const initApp = async () => {
+function redirect(path, replace = false) {
+	if (replace) window.location.replace(path);
+	else window.location.href = path;
+}
+
+const initServiceWorker = async () => {
 	if ("serviceWorker" in navigator) {
 		swReg = await navigator.serviceWorker.register("/sw.js");
-
 		navigator.serviceWorker.addEventListener("message", (event) => {
 			if (!event.data.action) return;
 			switch (event.data.action) {
@@ -36,17 +49,19 @@ const defaultState = function () {
 		{ label: "Title (asc)", value: "title" },
 		{ label: "Title (desc)", value: "-title" },
 	];
+	const page = getMeta("webtag-page");
+	const username = getMeta("webtag-username");
 	return {
 		online: navigator.onLine,
 		visible: document.visibilityState === "visible",
 		loading: true,
-		page: "",
+		page,
 		newAccount: { username: "", email: "", password: "" },
 		authCreds: { username: "", password: "" },
 		toast: [{ type: "", message: "" }],
 		me: { username: "", email: "", password: "", defaultTags: "", publicTags: "" },
 		myAccount: {},
-		username: window.localStorage.username,
+		username,
 		bookmarks: [],
 		tags: {},
 		query: searchParams.get("q"),
@@ -130,7 +145,7 @@ const App = Vue.createApp({
 			window.localStorage.username = this.username = response.data.username;
 			this.newAccount = { username: "", email: "", password: "" };
 			this.authCreds = { username: "", password: "" };
-			page.redirect("/");
+			redirect("/", true);
 			this.setToast(response.data.message, "success");
 		},
 		getMe(queryParams = "") {
@@ -201,7 +216,10 @@ const App = Vue.createApp({
 			axios.post("/api/bookmarks", { ...this.newBookmark }).then((response) => {
 				this.setToast(response.data.message, "success");
 				this.newBookmark = { tags: this.me.defaultTags.join(", "), url: "" };
-				page.redirect("/");
+				// this will close the window only if it opened by a script
+				window.close();
+
+				redirect("/");
 			});
 		},
 		saveBookmark() {
@@ -245,7 +263,7 @@ const App = Vue.createApp({
 				const { id } = this.updateBookmark;
 				axios.delete(`/api/bookmarks/${id}`).then((response) => {
 					this.setToast(response.data.message, "success");
-					page.redirect("/");
+					redirect("/");
 				});
 			}
 		},
@@ -342,7 +360,7 @@ const App = Vue.createApp({
 			const localClear = () => {
 				window.localStorage.clear();
 				this.resetState();
-				page.redirect("/");
+				redirect("/");
 			};
 			if (autoSignOut || confirm("Are you sure, you want to log out?")) axios.post("/api/logout").finally(localClear);
 		},
@@ -350,6 +368,34 @@ const App = Vue.createApp({
 			const error = { message, source, lineno, colno, username: this.username, page: this.page };
 			axios.post("/api/error", { error }).then(() => {});
 			return true;
+		},
+		initApp() {
+			if (this.isloggedIn) this.getMe();
+
+			switch (this.page) {
+				case "bookmarks":
+					{
+						const urlParams = new URLSearchParams(window.location.search);
+						this.query = urlParams.get("q");
+						this.queryTags = urlParams.get("tags");
+						this.getBookmarks();
+					}
+					break;
+				case "tags":
+					this.getTags();
+					break;
+				case "edit":
+					{
+						const urlParams = new URLSearchParams(window.location.search);
+						if (!urlParams.get("id")) return redirect("/");
+						this.updateBookmark.id = urlParams.get("id");
+						this.page = "editBookmark";
+						this.getBookmark(this.updateBookmark.id);
+					}
+					break;
+				default:
+					break;
+			}
 		},
 	},
 }).mount("#app");
@@ -360,8 +406,9 @@ document.addEventListener("visibilitychange", App.setVisibility);
 window.onerror = App.logError;
 
 (() => {
-	if (window.CSRF_TOKEN) {
-		axios.defaults.headers.common["x-csrf-token"] = window.CSRF_TOKEN;
+	const csrfToken = getMeta("csrf-token");
+	if (csrfToken) {
+		axios.defaults.headers.common["x-csrf-token"] = csrfToken;
 	}
 
 	axios.interceptors.request.use((config) => {
@@ -380,77 +427,6 @@ window.onerror = App.logError;
 			throw error;
 		}
 	);
-	initApp();
+	initServiceWorker();
+	App.initApp();
 })();
-
-page("*", (ctx, next) => {
-	// resetting state on any page load
-	App.resetState();
-	if (window.cancelRequestController) {
-		window.cancelRequestController.abort();
-	}
-	if (App.isloggedIn) App.getMe();
-	next();
-});
-
-/* Routes declaration */
-page("/", (ctx) => {
-	document.title = "Webtag - A free text-based bookmarking.";
-	App.page = App.isloggedIn ? "home" : "intro";
-
-	if (App.isloggedIn) {
-		const urlParams = new URLSearchParams(ctx.querystring);
-		App.query = urlParams.get("q");
-		App.queryTags = urlParams.get("tags");
-		App.getBookmarks();
-	}
-});
-
-page("/signup", () => {
-	document.title = "Sign up: Webtag";
-	if (App.isloggedIn) return page.redirect("/");
-	else App.page = "signup";
-});
-
-page("/login", () => {
-	document.title = "Log in: Webtag";
-	if (App.isloggedIn) return page.redirect("/");
-	else App.page = "login";
-});
-
-page("/tags", () => {
-	document.title = "My tags: Webtag";
-	if (!App.isloggedIn) return page.redirect("/login");
-	App.page = "tags";
-	App.getTags();
-});
-
-page("/bookmark", () => {
-	document.title = "New bookmark: Webtag";
-	if (!App.isloggedIn) return page.redirect("/login");
-	App.page = "newBookmark";
-});
-
-page("/edit", (ctx) => {
-	document.title = "Edit bookmark: Webtag";
-	if (!App.isloggedIn) return page.redirect("/login");
-	const urlParams = new URLSearchParams(ctx.querystring);
-	if (!urlParams.get("id")) return page.redirect("/");
-	App.updateBookmark.id = urlParams.get("id");
-	App.page = "editBookmark";
-	App.getBookmark(App.updateBookmark.id);
-});
-
-page("/account", () => {
-	document.title = "My acount: Webtag";
-	if (!App.isloggedIn) return page.redirect("/login");
-	App.page = "account";
-	App.getMe();
-});
-
-page("/*", () => {
-	document.title = "Page not found: Webtag";
-	App.page = "404";
-});
-
-page();

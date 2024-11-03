@@ -1,0 +1,40 @@
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Cache-control" content="public" />
+	<meta
+		name="viewport"
+		content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
+	/>
+	<meta name="description" content="A free text-based bookmarking website." />
+	<meta name="keywords" content="bookmarking, free bookmarking, push notifications, web push" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+	<% if(typeof csrfToken !== "undefined") { %>
+	<meta name="csrf-token" content="<%= csrfToken %>" />
+	<% } %> <% if(typeof user !== "undefined") { %>
+	<meta name="webtag-username" content="<%= user.username %>" />
+	<% } %>
+	<meta name="webtag-page" content="<%= page %>" />
+
+	<!-- Icons & Theme-->
+	<meta name="theme-color" content="#f22952" />
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+	<link rel="mask-icon" href="/mask-icon.svg" color="#f22952" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+	<link rel="manifest" href="/manifest.json" />
+
+	<!-- Meta data for link fetching -->
+	<meta property="og:url" content="https://webtag.io" />
+	<meta property="og:image" content="https://webtag.io/banner.png" />
+	<meta property="og:title" content="Webtag" />
+	<meta property="og:description" content="A free text-based bookmarking website." />
+
+	<title><%= title %></title>
+
+	<!-- Site scripts & styles -->
+	<link href="/style.css" rel="stylesheet" />
+
+	<script defer src="/vue.global.prod.js"></script>
+	<script defer src="/axios.min.js"></script>
+	<script defer src="/script.js"></script>
+</head>

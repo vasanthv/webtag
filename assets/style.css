@@ -15,8 +15,17 @@ body {
 	background: var(--background);
 	color: var(--text);
 	margin: 0;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
-		"Helvetica Neue", sans-serif;
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		Roboto,
+		Oxygen-Sans,
+		Ubuntu,
+		Cantarell,
+		"Helvetica Neue",
+		sans-serif;
 	line-height: 1.5;
 	transition: background 0.5s;
 }
@@ -229,9 +238,6 @@ section h1 {
 	transform: translateX(1.5rem);
 }
 
-#app-containter {
-	visibility: hidden;
-}
 #toast {
 	background-color: var(--text);
 	color: var(--background);
