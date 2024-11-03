@@ -7,7 +7,16 @@ const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", function (e) {
 	console.log("Install event triggered. New updates available.");
-	const filesToCache = ["/manifest.json", "/style.css", "/vue.global.prod.js", "/axios.min.js", "/script.js"];
+	const filesToCache = [
+		"/favicon.ico",
+		"/favicon.svg",
+		"/manifest.json",
+		"/style.css",
+		"/vue.global.prod.js",
+		"/axios.min.js",
+		"/script.js",
+		"/offline",
+	];
 
 	// Deleting the previous version of cache
 	e.waitUntil(
