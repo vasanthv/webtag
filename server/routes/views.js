@@ -65,6 +65,10 @@ router.get("/privacy", async (req, res) => {
 	res.render("privacy", getViewProps(req, "Privacy policy - Webtag"));
 });
 
+router.get("/sunset", async (req, res) => {
+	res.render("sunset", getViewProps(req, "Sunsetting - Webtag"));
+});
+
 router.get("/looptap", async (req, res) => {
 	res.render("looptap", getViewProps(req, "Looptap - Webtag"));
 });

@@ -1,0 +1,9 @@
+<div id="sunset">
+	<div>📢 Important Announcement: Webtag is Sunsetting</div>
+	<p>Webtag will no longer be available after January 2nd, 2025. Please download your bookmarks before this date.</p>
+
+	<a href="/sunset">Read more</a>
+	<% if(typeof user !== "undefined") { %> &nbsp; &middot; &nbsp;
+	<a href="javascript:void(0)" v-on:click="exportBookmarks">Download Your Bookmarks</a>
+	<% } %>
+</div>

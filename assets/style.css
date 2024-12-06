@@ -263,6 +263,13 @@ section h1 {
 #toast.success {
 	background: var(--green);
 }
+#sunset {
+	padding: 1rem;
+	box-sizing: border-box;
+	border: 2px solid #ce2724;
+	background: #f5cdcc;
+	color: #000;
+}
 .loader {
 	width: 2rem;
 	height: 2rem;
